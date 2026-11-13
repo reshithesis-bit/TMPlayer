@@ -680,6 +680,23 @@ class SettingsStore(private val prefs: DataStore<Preferences>) : AllowedChatsSou
     }
 
     /**
+     * Gives each file its own rename in one write ([ManualSeries]): every copy of a tile is
+     * passed, each with the title of the episode it is. Other corrections on a file stay.
+     */
+    suspend fun retitle(titles: List<Pair<MediaItem, String>>) {
+        val now = VideoCorrections.current
+        val updated = titles.distinctBy { it.first.id }
+            .map { (item, title) -> item to (now[item.id] ?: VideoCorrection()).copy(title = title.trim().ifEmpty { null }) }
+        prefs.edit { prefs ->
+            for ((item, correction) in updated) {
+                val key = stringPreferencesKey(VideoCorrections.keyName(item.chatId, item.messageId))
+                if (correction.isEmpty) prefs.remove(key) else prefs[key] = correction.encode()
+            }
+        }
+        updated.forEach { (item, correction) -> VideoCorrections.put(item.id, correction) }
+    }
+
+    /**
      * The chat to open immediately, or null to show the chat list.
      *
      * Read straight from disk rather than from a collected flow: this runs once, the moment the

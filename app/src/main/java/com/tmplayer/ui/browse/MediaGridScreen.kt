@@ -524,6 +524,34 @@ fun MediaGridScreen(
     // Only while there is a selection to leave, so Back still leaves the chat the rest of the time.
     BackHandler(enabled = selecting) { leaveSelection() }
 
+    // "Make series": the ticked videos become the episodes of a show the viewer names, numbered
+    // in the order they were ticked. See [com.tmplayer.data.ManualSeries].
+    var makingSeries by remember(chatId) { mutableStateOf(false) }
+    if (makingSeries && selected.isNotEmpty()) {
+        val ticked = selected.values.toList()
+        com.tmplayer.player.BookmarkNoteSheet(
+            title = LocalStrings.current.gridMakeSeriesTitle(ticked.size),
+            initial = "",
+            saveLabel = LocalStrings.current.gridRenameSave,
+            onSave = { text ->
+                // Nothing usable typed (or too many for one season): the sheet closes and the
+                // ticks stay, so the viewer can try again without picking the videos twice.
+                val titles = com.tmplayer.data.ManualSeries.titles(ticked, text)
+                makingSeries = false
+                if (titles != null) {
+                    // Every copy of a tile, so the episode holds whichever one it shows.
+                    val all = titles.flatMap { (item, title) -> com.tmplayer.data.VideoCorrections.filesOf(item).map { it to title } }
+                    scope.launch { runCatching { settings.retitle(all) } }
+                    leaveSelection()
+                }
+            },
+            onDismiss = { makingSeries = false },
+            onClose = { makingSeries = false },
+            hint = LocalStrings.current.gridMakeSeriesHint,
+            maxLength = com.tmplayer.data.VideoCorrections.TITLE_MAX,
+        )
+    }
+
     /**
      * Queues videos, having first asked the disk whether they fit: see [queueDownloads], which
      * every route in goes through, the detail panel's Download included.
@@ -1070,6 +1098,7 @@ fun MediaGridScreen(
                     SelectionBar(
                         count = selected.size,
                         onDownload = downloadSelected,
+                        onMakeSeries = { makingSeries = true },
                         onSelectAll = { selected = listedItems.associateBy { it.id } },
                         onCancel = { leaveSelection() },
                         edge = edge,
@@ -1101,6 +1130,7 @@ fun MediaGridScreen(
                 SelectionBar(
                     count = selected.size,
                     onDownload = downloadSelected,
+                    onMakeSeries = { makingSeries = true },
                     onSelectAll = { selected = listedItems.associateBy { it.id } },
                     onCancel = { leaveSelection() },
                     edge = edge,
@@ -1715,6 +1745,8 @@ private fun SelectionBar(
     count: Int,
     /** Null while nothing ticked may be saved, which leaves the bar without a Download. */
     onDownload: (() -> Unit)?,
+    /** Turns the ticked videos into a show's episodes; the bar offers it from two videos up. */
+    onMakeSeries: () -> Unit,
     onSelectAll: () -> Unit,
     onCancel: () -> Unit,
     edge: Dp,
@@ -1733,6 +1765,7 @@ private fun SelectionBar(
                 modifier = Modifier.weight(1f).padding(start = 14.dp),
             )
             TextButton(onClick = onSelectAll) { M3Text(s.gridSelectAll, maxLines = 1) }
+            TextButton(onClick = onMakeSeries, enabled = count >= 2) { M3Text(s.gridMakeSeries, maxLines = 1) }
             // Words, not a bare arrow: this is the one control on the bar that acts on the
             // ticked videos, and a corner glyph would say nothing about what it starts.
             if (onDownload != null) Button(
@@ -1767,6 +1800,7 @@ private fun SelectionBar(
             modifier = Modifier.weight(1f),
         )
         if (onDownload != null) Pill(s.gridDownload, TmIcons.Download, onClick = onDownload)
+        if (count >= 2) Pill(s.gridMakeSeries, TmIcons.Check, onClick = onMakeSeries)
         Pill(s.gridSelectAll, TmIcons.Check, onClick = onSelectAll)
         Pill(s.commonCancel, TmIcons.Close, onClick = onCancel)
     }
