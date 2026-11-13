@@ -318,7 +318,13 @@ object SeriesShelf {
         // A caption line the chat puts under most of its posts says nothing about which video a
         // post is, so a file whose caption opens with one is read by its name alone.
         val repeated = MediaText.repeatedCaptionLines(items)
-        val trusted = items.map { item -> repeated.isEmpty() || firstLine(item)?.lowercase()?.let { it !in repeated } != false }
+        // Not when a later line of the caption names the episode ("Episode 7" under a show's name
+        // that every post repeats): the repeated line is the title there, and the number is the
+        // part of the caption that tells the posts apart.
+        val trusted = items.map { item ->
+            repeated.isEmpty() || firstLine(item)?.lowercase()?.let { it !in repeated } != false ||
+                (item.parsedName.isEpisode && !item.parsedNameAlone.isEpisode)
+        }
         val names = items.mapIndexed { index, item -> episodeOf(item, corrections, trusted[index]) }
         val separate = items.map { corrections[it.id]?.separate == true }
         val strict = items.indices.map { index ->
@@ -350,6 +356,13 @@ object SeriesShelf {
             showKeys.filter { other -> other != key && key.startsWith("$other ") && other.split(' ').size >= 2 }
                 .maxByOrNull { it.length }
                 ?.takeIf { other -> mine.count { it in numbersOf[other].orEmpty() } * 2 >= mine.size }
+                // The same show under a fuller name that is no extension of the short one,
+                // "Mevlana Rumi" and "Mevlana Celaleddin i Rumi": the shorter name's words are in
+                // the longer in order, and the two never number the same episode, so they are
+                // halves of one run and not two shows.
+                ?: showKeys.filter { other -> other != key && other.split(' ').size < key.split(' ').size && sharesShowWords(other, key) }
+                    .filter { other -> mine.none { it in numbersOf[other].orEmpty() } }
+                    .minByOrNull { it.length }
                 ?: key
         }
 
@@ -624,6 +637,30 @@ object SeriesShelf {
             .filter { it.split(' ').size >= 2 }
             .mapNotNull { short -> showKeys.filter { it.startsWith("$short ") }.singleOrNull() }
             .firstOrNull()
+            ?: keys.asSequence()
+                .mapNotNull { name -> showKeys.filter { sharesShowWords(name, it) }.singleOrNull() }
+                .firstOrNull()
+    }
+
+    /**
+     * Whether [a] and [b] are one show's name written fuller and shorter, where neither is the
+     * other with words added on the end: both have two words at least, they start and end on the
+     * same word, and the shorter one's words all appear in the longer in the same order.
+     * "mevlana rumi" and "mevlana celaleddin i rumi" qualify; "harbour notes" and "harbour notes
+     * new tides" do not (that is a sequel, and [arrange] has its own rule for it).
+     */
+    internal fun sharesShowWords(a: String, b: String): Boolean {
+        val x = a.split(' ')
+        val y = b.split(' ')
+        val (short, long) = if (x.size <= y.size) x to y else y to x
+        if (short.size < 2 || short.size == long.size) return false
+        if (short.first() != long.first() || short.last() != long.last()) return false
+        var at = 0
+        for (word in short) {
+            val found = (at until long.size).firstOrNull { long[it] == word } ?: return false
+            at = found + 1
+        }
+        return true
     }
 
     /** Whether [item]'s name or its caption's first line holds something [MediaName.looseEpisode] could read. */

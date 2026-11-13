@@ -103,15 +103,42 @@ object MediaName {
     fun parse(fileName: String, caption: String?, maxYear: Int = thisYear() + 1): ParsedName {
         val fromName = parse(fileName, maxYear)
         if (fromName.isEpisode) return fromName
-        val line = caption?.lineSequence()?.map { it.trim() }?.firstOrNull { it.isNotEmpty() }
-            ?: return fromName
+        val lines = caption?.lineSequence()?.map { it.trim() }?.filter { it.isNotEmpty() }
+            ?.take(CAPTION_LINES)?.toList().orEmpty()
+        val line = lines.firstOrNull() ?: return fromName
         val fromCaption = read(line, maxYear).parsed
-        if (!fromCaption.isEpisode) return fromName
         val nameTitle = fromName.title.takeIf { fileName.isNotBlank() }.orEmpty()
-        return fromCaption.copy(
-            title = fromCaption.title.ifEmpty { nameTitle },
+        if (fromCaption.isEpisode) {
+            return fromCaption.copy(
+                title = fromCaption.title.ifEmpty { nameTitle },
+                year = fromCaption.year ?: fromName.year,
+            )
+        }
+        // The title on the first line and the episode on one of the next, as channels write it:
+        // "Show Name English Subtitle", a blank line, "Episode 7", a blank line, "1080p FHD".
+        // Only a line that starts with the episode marker counts, so a sentence that happens to
+        // mention an episode further down a caption is not taken for this file's number.
+        val later = lines.drop(1).firstNotNullOfOrNull { episodeLine(it, maxYear) } ?: return fromName
+        val title = nameTitle.takeUnless { fileName.isBlank() || MediaText.isGenericName(fileName) }.orEmpty()
+            .ifEmpty { fromCaption.title }
+        if (title.isEmpty()) return fromName
+        return later.copy(
+            title = title,
             year = fromCaption.year ?: fromName.year,
         )
+    }
+
+    /**
+     * A caption line that is nothing but an episode marker and maybe its name: "Episode 7",
+     * "Ep. 7", "Episode - 07", "S01E07 The Storm". Null for a line with a title before the marker
+     * or no episode number in it.
+     */
+    private fun episodeLine(line: String, maxYear: Int): ParsedName? {
+        val read = read(line, maxYear).parsed
+        if (read.isEpisode && read.title.isEmpty()) return read
+        val match = CAPTION_EPISODE_LINE.find(stripDecoration(line)) ?: return null
+        val number = match.groupValues[2].toIntOrNull()?.takeIf { it > 0 } ?: return null
+        return ParsedName(title = "", year = null, season = match.groupValues[1].toIntOrNull(), episode = number)
     }
 
     /**
@@ -834,6 +861,15 @@ object MediaName {
     /** A bracketed group name at the very front, before any title. Never a year. */
     private val GROUP_TAG = Regex("""^\s*\[(?!\s*(?:19|20)\d{2}\s*\])[^\]]{1,40}\]\s*""")
 
+    /** How many caption lines are read for an episode: the rest is credits, links and adverts. */
+    private const val CAPTION_LINES = 8
+
+    /** "Ep. 7", "Episode: 07", "Season 2 Episode - 4": an episode line the file-name forms miss. */
+    private val CAPTION_EPISODE_LINE = Regex(
+        """^(?:season\s?(\d{1,2})\W+)?(?:episode|ep)\b\.?\s*[:#-]?\s*(\d{1,3})\b""",
+        RegexOption.IGNORE_CASE,
+    )
+
     private val SEASON_ONLY = Regex("""\b(?:s|season\s?)(\d{1,2})\b""", RegexOption.IGNORE_CASE)
 
     /**
@@ -889,7 +925,7 @@ object MediaName {
             "anniversary", "special ?edition", "final ?cut",
             // Release furniture
             "proper", "repack", "extended", "unrated", "uncut", "limited", "internal",
-            "complete", "retail", "subbed", "dubbed", "esubs?", "msubs?", "hq", "hs", "nuked",
+            "complete", "retail", "subbed", "dubbed", "subtitles?", "esubs?", "msubs?", "hq", "hs", "nuked",
             "full ?movie", "\\d+(?:\\.\\d+)? ?[mg]b",
         ).joinToString("|") + """)\b""",
         RegexOption.IGNORE_CASE,

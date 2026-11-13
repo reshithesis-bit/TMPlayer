@@ -182,4 +182,47 @@ class CaptionsAndLessonsTest {
         assertEquals(3, show.episodeCount)
         assertEquals(1080, show.episodes.last().episode)
     }
+
+    @Test
+    fun `an episode on a later caption line is read, with the title from the first`() {
+        val caption = "[BB] Mevlana Celaleddin-i Rumi English Subtitle\n\nEpisode 7\n\n1080p FHD"
+        val parsed = MediaName.parse("", caption)
+        assertEquals("Mevlana Celaleddin-i Rumi", parsed.title)
+        assertEquals(7, parsed.episode)
+        // The same when the title is what stands in for the missing file name.
+        val named = MediaName.parse("[BB] Mevlana Celaleddin-i Rumi English Subtitle", caption)
+        assertEquals("Mevlana Celaleddin-i Rumi", named.title)
+        assertEquals(7, named.episode)
+        assertEquals(3, MediaName.parse("", "Show Name\nEp. 3").episode)
+        assertEquals(4, MediaName.parse("", "Show Name\nEpisode - 04").episode)
+        assertEquals(2, MediaName.parse("", "Show Name\nSeason 2 Episode 5").season)
+    }
+
+    @Test
+    fun `a sentence that mentions an episode is not an episode line`() {
+        assertEquals(null, MediaName.parse("", "Lecture notes\nSee the earlier episode 4 for the proof").episode)
+        assertEquals(null, MediaName.parse("", "Holiday video\nJoin us for episode 2 soon").episode)
+    }
+
+    @Test
+    fun `episodes whose captions put the number on another line group into one show`() {
+        val items = (1..4).map { number ->
+            video("", "[BB] Mevlana Celaleddin-i Rumi English Subtitle\n\nEpisode $number\n\n1080p FHD")
+        }
+        val shows = SeriesShelf.arrange(items).filterIsInstance<ShelfEntry.Show>()
+        assertEquals(1, shows.size)
+        assertEquals(4, shows[0].series.episodeCount)
+    }
+
+    @Test
+    fun `one show under a shorter and a fuller name is one show`() {
+        val short = listOf(1, 2, 3, 4, 6, 9).map { video("Mevlana.Rumi.S01E0$it.mkv") }
+        val full = video("", "[BB] Mevlana Celaleddin-i Rumi English Subtitle\n\nEpisode 7\n\n1080p FHD")
+        val shows = SeriesShelf.arrange(short + full).filterIsInstance<ShelfEntry.Show>()
+        assertEquals(1, shows.size)
+        assertEquals(7, shows[0].series.episodeCount)
+        // A sequel is still apart.
+        assertTrue(SeriesShelf.sharesShowWords("mevlana rumi", "mevlana celaleddin i rumi"))
+        assertFalse(SeriesShelf.sharesShowWords("harbour notes", "harbour notes new tides"))
+    }
 }
