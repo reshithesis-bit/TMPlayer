@@ -26,6 +26,9 @@ object ManualSeries {
         if (typed.isEmpty()) return null
         val parsed = MediaName.parse(typed)
         val title = parsed.title.trim().ifEmpty { return null }
+        // "S01E02" alone: with no title before it the parser falls back to the whole text, which
+        // is an episode code and no show's name.
+        if (parsed.isEpisode && title.equals(typed, ignoreCase = true)) return null
         val show = if (parsed.year != null) "$title (${parsed.year})" else title
         return Start(
             show = show,
