@@ -125,6 +125,20 @@ Each phase will be verified using:
 - Created `PLAN.md` documenting complete screen mappings, form factor specs, edge cases, and adapted vs excluded patterns.
 - Created and switched to local feature branch `redesign/nuvio-style`.
 - Verified repository rules: GPL-3.0 compliance, zero em/en dashes, and strict separation of UI from the streaming engine.
-- Note on environment: `JAVA_HOME` is currently unset on this machine. Setting JDK 21 (e.g. via `winget install Microsoft.OpenJDK.21` or existing JDK) will be required when running Gradle verification builds in subsequent phases.
 
-Next step: Wait for user confirmation to begin Phase 1 (Design system foundations in `:ui`).
+### Phase 1 Status: Complete
+- Design system foundation and tokens implemented in `:ui`:
+  - `com.tmplayer.ui.theme.TmTokens`: Spacing (0-64dp), Radius (cards 24dp, buttons 16dp, badges 4dp, pills full), Border (hairline 0.5dp, thin 1dp, medium 2dp), Elevation, Opacity, Motion (standard/decelerate/accelerate easings and duration tokens), and Breakpoints.
+  - `com.tmplayer.ui.theme.Tone`: Extended with `surfaceCard`, `borderSubtle`, `borderDefault`, `shimmer`, and `skeleton`.
+  - `com.tmplayer.ui.components.TmDesignSystem`: Nuvio-style components with focus and press animations: `TmSurfaceCard`, `TmClickableCard`, `TmPrimaryButton`, `TmSecondaryButton`, `TmBackButton`, `TmIconButton`, `TmInputField`, `TmChip`, `TmBadge`, and `TmProgressBar`.
+- Machine Verification:
+  - OpenJDK 21 configured.
+  - `:ui:jvmTest` executed and passed completely (all contrast and component tests green).
+  - `:desktop:compileKotlin` compiled successfully.
+  - Em/en dash check: verified zero instances in code, comments, or documentation.
+- Manual checklist for Phase 1 components:
+  - Contrast check: Verified via automated `AccentContrastTest` meeting WCAG AA requirements across all accents.
+  - Visual hierarchy: Cards use subtle translucent hairline borders rather than heavy opaque strokes.
+  - TV focus indicator: Integrates with `focusRing` and D-pad states.
+
+Next step: Wait for user confirmation to begin Phase 2 (Navigation and Home Screen redesign across Phone, TV, and Desktop).

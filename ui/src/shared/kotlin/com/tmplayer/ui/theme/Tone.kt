@@ -146,6 +146,31 @@ object Tone {
     val caution: Color
         @Composable @ReadOnlyComposable get() =
             if (LocalDarkTheme.current) Caution else Color(0xFF8A5300)
+
+    /** Card surface in Nuvio style, one step above the canvas background. */
+    val surfaceCard: Color
+        @Composable @ReadOnlyComposable get() =
+            M3.colorScheme.surfaceContainer
+
+    /** Subtle hairline border for cards and panels. */
+    val borderSubtle: Color
+        @Composable @ReadOnlyComposable get() =
+            if (LocalDarkTheme.current) Color.White.copy(alpha = 0.08f) else Color.Black.copy(alpha = 0.08f)
+
+    /** Default border for inputs and interactive controls. */
+    val borderDefault: Color
+        @Composable @ReadOnlyComposable get() =
+            if (LocalDarkTheme.current) Color.White.copy(alpha = 0.14f) else Color.Black.copy(alpha = 0.14f)
+
+    /** Shimmer highlight color for skeleton loading. */
+    val shimmer: Color
+        @Composable @ReadOnlyComposable get() =
+            if (LocalDarkTheme.current) Color.White.copy(alpha = 0.08f) else Color.Black.copy(alpha = 0.08f)
+
+    /** Skeleton placeholder base color. */
+    val skeleton: Color
+        @Composable @ReadOnlyComposable get() =
+            if (LocalDarkTheme.current) Color.White.copy(alpha = 0.04f) else Color.Black.copy(alpha = 0.04f)
 }
 
 /** [Tone.onArt], as a constant for code that draws outside composition. */
