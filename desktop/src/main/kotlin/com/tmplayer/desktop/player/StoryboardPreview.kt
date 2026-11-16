@@ -328,7 +328,7 @@ private fun SeekCard(time: String, positionMs: Long, modifier: Modifier) {
         modifier
             .clip(shape)
             .background(Color.Black)
-            .border(1.dp, Color.White.copy(alpha = 0.28f), shape),
+            .border(com.tmplayer.ui.theme.TmTokens.Border.hairline, Color.White.copy(alpha = 0.22f), shape),
     ) {
         when {
             picture != null -> SeekShotPicture(picture, Modifier.alpha(fade.value))

@@ -238,8 +238,8 @@ private val BottomScrimHeight = 260.dp
  * The seat the bar's buttons share: one pill in black at half strength with a faint white edge,
  * so the row reads as one control over any frame instead of glyphs floating on the picture.
  */
-private val ControlsPillFill = Color.Black.copy(alpha = 0.5f)
-private val ControlsPillEdge = Color.White.copy(alpha = 0.16f)
+private val ControlsPillFill = Color(0xD9101014)
+private val ControlsPillEdge = Color.White.copy(alpha = 0.14f)
 
 /** The times and the line under the title: white at 72 per cent, as text on art is everywhere. */
 private val OnArtMuted = Color.White.copy(alpha = 0.72f)
@@ -253,8 +253,8 @@ private const val FADE_OUT_MS = 200
  * near-black surface container let partly through. The caption tone carries small text (chips,
  * flashes); the button tone sits under the round centre buttons.
  */
-internal val PlayerTonal = Color(0xB3101014)
-internal val PlayerTonalButton = Color(0x8C101014)
+internal val PlayerTonal = Color(0xD9101014)
+internal val PlayerTonalButton = Color(0xB3101014)
 private val OnPlayerTonal = Color(0xF2FFFFFF)
 
 /** The A-B repeat on the timebar: amber, apart from the played blue and the buffered grey. */
@@ -706,7 +706,7 @@ private fun ShapeButton(scale: VideoScale, onClick: () -> Unit) {
 private fun ControlsPill(content: @Composable RowScope.() -> Unit) {
     Row(
         Modifier.height(44.dp).clip(CircleShape).background(ControlsPillFill)
-            .border(1.dp, ControlsPillEdge, CircleShape)
+            .border(com.tmplayer.ui.theme.TmTokens.Border.hairline, ControlsPillEdge, CircleShape)
             .padding(horizontal = 2.dp),
         verticalAlignment = Alignment.CenterVertically,
         content = content,
@@ -896,14 +896,14 @@ private fun TimeBar(
         val played = if (shownX != null) (shownX / width).coerceIn(0f, 1f) else SeekMath.fraction(position, duration)
         val ahead = SeekMath.fraction(buffered, duration)
         val thick = hoverX != null || dragX != null
-        val primary = MaterialTheme.colorScheme.primary
+        val primary = Tone.accent
         val track = Tone.track
         // 4 dp at rest, 8 dp under the pointer or a drag, grown over the quick motion step.
         val barHeight by animateDpAsState(if (thick) 8.dp else 4.dp, Motion.standard(Motion.Fast))
         Canvas(Modifier.fillMaxWidth().height(barHeight)) {
             val r = CornerRadius(size.height / 2)
             drawRoundRect(track, cornerRadius = r)
-            if (ahead > played) drawRoundRect(primary.copy(alpha = 0.35f), size = Size(size.width * ahead, size.height), cornerRadius = r)
+            if (ahead > played) drawRoundRect(primary.copy(alpha = 0.30f), size = Size(size.width * ahead, size.height), cornerRadius = r)
             drawRoundRect(primary, size = Size(size.width * played, size.height), cornerRadius = r)
             // Chapter marks as gaps in the bar, the way YouTube splits it.
             val gap = 2.dp.toPx()
@@ -931,6 +931,9 @@ private fun TimeBar(
                 }
             }
             val thumb = if (thick) 8.dp.toPx() else 6.dp.toPx()
+            if (thick) {
+                drawCircle(primary.copy(alpha = 0.35f), thumb + 3.dp.toPx(), Offset(size.width * played, size.height / 2))
+            }
             drawCircle(primary, thumb, Offset(size.width * played, size.height / 2))
         }
         val labelX = dragX ?: hoverX
@@ -1354,7 +1357,7 @@ private fun ratioIcon(ratio: Double): ImageVector = ratioIcons.getOrPut(ratio) {
 internal fun BoxScope.FeedbackLayer(flash: Flash?, spinner: Boolean, chip: String?) {
     val s = LocalStrings.current
     if (spinner) {
-        CircularProgressIndicator(Modifier.align(Alignment.Center).size(48.dp), color = Color.White, strokeWidth = 3.dp)
+        CircularProgressIndicator(Modifier.align(Alignment.Center).size(48.dp), color = Tone.accent, strokeWidth = 3.dp)
     }
     if (chip != null) Chip(chip, Modifier.align(Alignment.TopEnd).padding(16.dp))
     val f = flash ?: return
@@ -1424,7 +1427,9 @@ internal fun BoxScope.ResumeNotice(from: Long, lifted: Boolean, onStartOver: () 
     }
     Row(
         Modifier.align(Alignment.BottomStart).padding(start = 16.dp, bottom = if (lifted) 120.dp else 24.dp)
-            .clip(CircleShape).background(Color(0xCC1C1C1E)).padding(start = 16.dp, end = 4.dp),
+            .clip(CircleShape).background(NextUpSurface)
+            .border(com.tmplayer.ui.theme.TmTokens.Border.hairline, ControlsPillEdge, CircleShape)
+            .padding(start = 16.dp, end = 4.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(s.playerResumingFrom(SeekMath.clock(from)), color = Color.White, fontSize = 14.sp)
@@ -1448,7 +1453,12 @@ internal fun BoxScope.NextUpCard(label: String, secondsLeft: Int, lifted: Boolea
         enter = slideInHorizontally { it } + fadeIn(),
         exit = slideOutHorizontally { it } + fadeOut(),
     ) {
-        Surface(shape = RoundedCornerShape(12.dp), color = NextUpSurface, modifier = Modifier.width(300.dp)) {
+        Surface(
+            shape = RoundedCornerShape(14.dp),
+            color = NextUpSurface,
+            border = floatingBorder(),
+            modifier = Modifier.width(300.dp),
+        ) {
             Column(Modifier.padding(16.dp)) {
                 Text(s.playerNextUp(label), color = Color.White, fontSize = 16.sp, fontWeight = FontWeight.SemiBold, maxLines = 2, overflow = TextOverflow.Ellipsis)
                 Text(s.playerNextIn(secondsLeft), color = Color.White.copy(alpha = 0.7f), fontSize = 13.sp)
@@ -1498,7 +1508,7 @@ internal fun BoxScope.SkipPill(kind: SkipKind, lifted: Boolean, onSkip: () -> Un
                 Modifier.testTag("skip-pill").height(44.dp).clip(RoundedCornerShape(22.dp))
                     .background(NextUpSurface)
                     .background(if (hovered) Color(0x33FFFFFF) else Color.Transparent)
-                    .border(1.dp, Color.White.copy(alpha = 0.35f), RoundedCornerShape(22.dp))
+                    .border(com.tmplayer.ui.theme.TmTokens.Border.hairline, ControlsPillEdge, RoundedCornerShape(22.dp))
                     .hoverable(hover)
                     .clickable(onClick = onSkip)
                     .padding(start = 20.dp, end = 16.dp),
@@ -1544,7 +1554,7 @@ internal fun BoxScope.UndoSeekChip(backToMs: Long, lifted: Boolean, onUndo: () -
                     .height(44.dp).clip(RoundedCornerShape(22.dp))
                     .background(NextUpSurface)
                     .background(if (hovered) Color(0x33FFFFFF) else Color.Transparent)
-                    .border(1.dp, Color.White.copy(alpha = 0.35f), RoundedCornerShape(22.dp))
+                    .border(com.tmplayer.ui.theme.TmTokens.Border.hairline, ControlsPillEdge, RoundedCornerShape(22.dp))
                     .hoverable(interaction)
                     .clickable(interactionSource = interaction, indication = androidx.compose.foundation.LocalIndication.current, onClick = onUndo)
                     .padding(start = 14.dp, end = 20.dp),
@@ -1567,7 +1577,7 @@ private fun EpisodesButton(onClick: () -> Unit) {
     Row(
         Modifier.padding(start = 8.dp).height(44.dp).clip(CircleShape)
             .background(ControlsPillFill)
-            .border(1.dp, ControlsPillEdge, CircleShape)
+            .border(com.tmplayer.ui.theme.TmTokens.Border.hairline, ControlsPillEdge, CircleShape)
             .background(if (hovered) Color(0x33FFFFFF) else Color.Transparent)
             .hoverable(hover)
             .clickable(onClick = onClick)
@@ -1648,7 +1658,8 @@ internal fun BoxScope.DetailsPanel(rows: () -> List<Pair<String, String>>, onClo
     Surface(
         Modifier.align(Alignment.TopEnd).padding(top = 72.dp, end = 16.dp).width(400.dp),
         shape = RoundedCornerShape(12.dp),
-        color = Color(0xE61C1C1E),
+        color = NextUpSurface,
+        border = floatingBorder(),
     ) {
         Column(Modifier.padding(16.dp).verticalScroll(rememberScrollState())) {
             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -1842,7 +1853,10 @@ private fun PlayPauseButton(status: PlaybackStatus, onTogglePlay: () -> Unit) {
     val reduced = com.tmplayer.ui.theme.rememberReducedMotion()
     Tip("${if (status.playing) s.playerPause else s.playerPlay} (${s.keysSpaceK})") {
         Box(
-            Modifier.size(72.dp).clip(CircleShape).background(PlayerTonalButton).clickable(onClick = onTogglePlay)
+            Modifier.size(72.dp).clip(CircleShape)
+                .background(PlayerTonalButton)
+                .border(com.tmplayer.ui.theme.TmTokens.Border.hairline, ControlsPillEdge, CircleShape)
+                .clickable(onClick = onTogglePlay)
                 .testTag("play-pause")
                 .semantics {
                     stateDescription = if (status.playing) s.playerPlaying else s.playerPaused
@@ -1851,7 +1865,7 @@ private fun PlayPauseButton(status: PlaybackStatus, onTogglePlay: () -> Unit) {
             contentAlignment = Alignment.Center,
         ) {
             if (status.buffering) {
-                CircularProgressIndicator(Modifier.size(40.dp), color = Color.White, strokeWidth = 3.dp)
+                CircularProgressIndicator(Modifier.size(40.dp), color = Tone.accent, strokeWidth = 3.dp)
             } else {
                 androidx.compose.animation.AnimatedContent(
                     targetState = status.playing,

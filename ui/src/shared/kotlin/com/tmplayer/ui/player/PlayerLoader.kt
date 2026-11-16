@@ -511,12 +511,13 @@ private fun Overview(text: String, sizeSp: Float, maxLines: Int, modifier: Modif
 @Composable
 private fun Progress(progress: Float, status: String, note: String?, labelSp: Float, modifier: Modifier) {
     val scheme = MaterialTheme.colorScheme
+    val accent = com.tmplayer.ui.theme.Tone.accent
     val shown by animateFloatAsState(progress.coerceIn(0f, 1f), tween(400))
     Column(modifier) {
         Canvas(Modifier.fillMaxWidth().height(4.dp)) {
             val r = CornerRadius(size.height / 2)
             drawRoundRect(scheme.onSurface.copy(alpha = 0.16f), cornerRadius = r)
-            if (shown > 0f) drawRoundRect(scheme.primary, size = Size(size.width * shown, size.height), cornerRadius = r)
+            if (shown > 0f) drawRoundRect(accent, size = Size(size.width * shown, size.height), cornerRadius = r)
         }
         Row(Modifier.padding(top = 10.dp), verticalAlignment = Alignment.CenterVertically) {
             val style = MaterialTheme.typography.labelLarge.copy(fontSize = labelSp.sp, lineHeight = (labelSp * 1.4f).sp)

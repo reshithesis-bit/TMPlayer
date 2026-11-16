@@ -381,8 +381,8 @@ private fun PanelButton(
         modifier
             .heightIn(min = if (tv) 48.dp else 44.dp)
             .clip(shape)
-            .background(if (focused) Tone.focusFill else Tone.surfaceHigh)
-            .then(if (!focused) Modifier.border(1.dp, Tone.outline, shape) else Modifier)
+            .background(if (focused) Tone.focusFill else Tone.surfaceCard)
+            .then(if (!focused) Modifier.border(com.tmplayer.ui.theme.TmTokens.Border.hairline, Tone.borderSubtle, shape) else Modifier)
             .clickable(
                 interactionSource = interactions,
                 indication = if (tv) null else androidx.compose.foundation.LocalIndication.current,
@@ -421,7 +421,8 @@ private fun SwitchLine(label: String, on: Boolean, onToggle: () -> Unit) {
             .fillMaxWidth()
             .heightIn(min = if (tv) 52.dp else 48.dp)
             .clip(shape)
-            .background(if (focused) Tone.focusFill else Tone.surfaceHigh)
+            .background(if (focused) Tone.focusFill else Tone.surfaceCard)
+            .then(if (!focused) Modifier.border(com.tmplayer.ui.theme.TmTokens.Border.hairline, Tone.borderSubtle, shape) else Modifier)
             .semantics {
                 role = Role.Switch
                 stateDescription = if (on) s.commonOn else s.commonOff

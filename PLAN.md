@@ -200,4 +200,24 @@ Each phase will be verified using:
   - Action buttons: Verify Watch Later, Watched, Download, and Share buttons display refined dark circular cards with hairline borders.
   - Copies and versions: Verify video versions dropdown / dialog renders with dark surface card styling.
 
-Next step: Wait for user confirmation to begin Phase 5 (Player UI).
+### Phase 5 Status: Complete
+- **Date**: 2026-11-16
+- **What was changed**:
+  - `PlayerOverlay.kt`: Upgraded `TimeBar` scrubber with active accent fill (`Tone.accent`), glowing thumb ring on hover/drag (`Tone.accent.copy(alpha = 0.35f)`), and translucent accent buffered progress (`Tone.accent.copy(alpha = 0.30f)`). Redesigned transport pills and buttons (`ControlsPill`, `ControlsPillFill`, `ControlsPillEdge`, `PlayerTonal`, `PlayerTonalButton`, `PlayPauseButton`) with dark translucent glass surfaces and hairline subtle borders. Updated buffering indicators to accent color.
+  - `PlayerOverlay.kt`: Modernized `NextUpCard`, `SkipPill`, `UndoSeekChip`, `ResumeNotice`, `EpisodesButton`, and `DetailsPanel` with `NextUpSurface` / `Tone.surfaceCard` and subtle hairline borders.
+  - `OnlineSubtitlesPanel.kt`: Modernized online subtitle search sheet surface and floating border.
+  - `StoryboardPreview.kt`: Refined `SeekCard` with hairline border for hover storyboard frames.
+  - `PlayerLoader.kt`: Updated pre-roll loader progress bar to use vibrant accent fill (`Tone.accent`).
+  - `EpisodesPanel.kt`: Modernized episode panel step buttons and switch lines with `Tone.surfaceCard` and hairline subtle borders.
+- **Verification**:
+  - `:desktop:compileKotlin` passed.
+  - `:desktop:test --tests "com.tmplayer.desktop.player.PlayerChromeShotsTest" :desktop:test --tests "com.tmplayer.desktop.player.SkipPillRenderTest" :desktop:test --tests "com.tmplayer.desktop.player.SeekShotsTest" :desktop:test --tests "com.tmplayer.desktop.player.PlayerMenuPanelShotsTest"` passed.
+  - `:ui:jvmTest` passed.
+- **Manual Verification Checklist**:
+  - Scrubber & Timeline: Verify seekbar displays vibrant accent played track with glowing outer halo on thumb during scrub/hover.
+  - Buffered range: Verify buffered progress displays translucent accent ahead of playhead.
+  - Transport HUD: Check play/pause center disc, controls pill, volume slider, and time readouts over dark and bright scenes.
+  - Track pickers & menu: Open audio, subtitle, and speed menus to verify clean floating panel with hairline borders.
+  - Storyboard hover: Hover over timeline to check preview thumbnail card with clean hairline border.
+
+Next step: Wait for user confirmation to begin Phase 6 (Settings).

@@ -98,7 +98,8 @@ internal fun BoxScope.OnlineSubtitlesPanel(
     Surface(
         Modifier.align(Alignment.TopEnd).padding(top = 72.dp, end = 16.dp).width(460.dp).heightIn(max = 560.dp),
         shape = RoundedCornerShape(12.dp),
-        color = Color(0xE61C1C1E),
+        color = Color(0xF2121216),
+        border = com.tmplayer.ui.theme.floatingBorder(),
     ) {
         Column(Modifier.padding(16.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
