@@ -242,4 +242,25 @@ Each phase will be verified using:
   - Storage & Subtitles: Verify storage overview ring card and subtitle look preview dialog render with dark surface card styling.
   - TV Focus Navigation: On TV layout, verify D-pad moves focus with clear accent ring and high-contrast text.
 
-Next step: Wait for user confirmation to begin Phase 7 (Remaining screens, polish, full test pass).
+### Phase 7 Status: Complete
+- **Date**: 2026-11-16
+- **What was changed**:
+  - `SignIn.kt`: Enhanced QR login pane with a subtle accent halo border on the white QR card (`Tone.borderSubtle` / `Tone.accent.copy(alpha = 0.35f)`) and updated `QrStep` number badges to use accent tint background (`Tone.accent.copy(alpha = 0.16f)`) with bold accent numeral text.
+  - `Downloads.kt`: Upgraded `Empty` download state container to use `Tone.surfaceCard` and `Tone.borderSubtle` hairline border. Enhanced `VideoRow` hover state with `Tone.surfaceCard`. Updated active download progress bar (`LinearProgressIndicator`) with vibrant accent fill (`Tone.accent`).
+  - `DownloadsScreen.kt`: Redesigned Android `RowCard` and `StorageCard` to use `Tone.surfaceCard` background and `Tone.borderSubtle` hairline borders on both phone and TV.
+  - `HistorySelection.kt`: Modernized `HistorySelectionBar` floating surface with `Tone.surfaceCard` and `Tone.borderSubtle` hairline border.
+  - `THIRD_PARTY_NOTICES.md`: Added attribution for NuvioMobile design patterns, tokens, and styling under GNU General Public License version 3.
+- **Verification**:
+  - `:desktop:compileKotlin` passed without warnings or errors.
+  - `:desktop:test --tests "com.tmplayer.desktop.ui.BigScreenKeysTest" :desktop:test --tests "com.tmplayer.desktop.ui.BrowseKeyboardTest"` passed (TV D-pad and arrow key focus navigation verified).
+  - `:desktop:test --tests "com.tmplayer.desktop.ui.DownloadsRenderTest"` passed.
+  - `:ui:jvmTest` passed.
+  - Verified zero em or en dashes across all files and documentation.
+- **Manual Verification Checklist**:
+  - QR Login: Check QR plate displays clean rounded card with subtle accent glow and readable step indicators.
+  - Downloads Page: Verify active downloads display real-time speed, ETA, and accent progress bar; empty state displays dark card with subtle border.
+  - History Selection: Select multiple videos in history to verify floating action bar displays elevated dark surface with clean button styling.
+  - Search Palette: Press Ctrl+K (or Cmd+K) to open search palette; verify dark floating dialog with hairline border and accurate Telegram search results.
+  - TV D-Pad Focus: Navigate through top bar, cards, rows, and buttons using arrow keys/remote to verify clear focus rings and responsive selection.
+
+Full redesign across all phases (Phase 0 through Phase 7) is complete and committed locally on `redesign/nuvio-style`.

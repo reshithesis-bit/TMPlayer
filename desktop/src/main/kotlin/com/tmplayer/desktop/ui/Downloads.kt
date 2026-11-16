@@ -894,7 +894,8 @@ private fun ShowHeading(title: String, detail: String) {
 private fun Empty(text: String, actionLabel: String? = null, onAction: (() -> Unit)? = null) {
     Surface(
         shape = RoundedCornerShape(Corner.Large),
-        color = Tone.surface,
+        color = Tone.surfaceCard,
+        border = androidx.compose.foundation.BorderStroke(com.tmplayer.ui.theme.TmTokens.Border.hairline, Tone.borderSubtle),
         modifier = Modifier.fillMaxWidth().padding(horizontal = ROW_INSET, vertical = 4.dp),
     ) {
         Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -939,7 +940,7 @@ private fun VideoRow(
             Modifier
                 .fillMaxWidth()
                 .clip(shape)
-                .background(if (hovered || ring) Tone.surface else Color.Transparent)
+                .background(if (hovered || ring) Tone.surfaceCard else Color.Transparent)
                 .then(if (ring) Modifier.border(Focus.Edge, Tone.accent, shape) else Modifier)
                 .hoverable(interactions)
                 .onPointerEvent(PointerEventType.Press) { event ->
@@ -1096,6 +1097,7 @@ private fun ActiveRow(state: ShellState, row: OfflineDownloads.Progress, onFreeU
                     progress = { fraction },
                     gapSize = 0.dp,
                     drawStopIndicator = {},
+                    color = Tone.accent,
                     trackColor = Tone.surfaceHigh,
                     modifier = Modifier.padding(top = 6.dp).fillMaxWidth().height(4.dp).clip(CircleShape),
                 )

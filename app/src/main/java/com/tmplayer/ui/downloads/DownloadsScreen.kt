@@ -1585,10 +1585,11 @@ internal fun StorageSummary(
     result: String? = null,
 ) {
     val tv = !isTouch()
+    val shape = if (tv) RoundedCornerShape(Corner.Large) else MaterialTheme.shapes.large
     Card(
-        Modifier.fillMaxWidth().padding(CARD_EDGE),
-        shape = if (tv) RoundedCornerShape(Corner.Large) else MaterialTheme.shapes.large,
-        colors = CardDefaults.cardColors(containerColor = Tone.surface),
+        Modifier.fillMaxWidth().padding(CARD_EDGE).border(com.tmplayer.ui.theme.TmTokens.Border.hairline, Tone.borderSubtle, shape),
+        shape = shape,
+        colors = CardDefaults.cardColors(containerColor = Tone.surfaceCard),
     ) {
         StorageOverview(
             figures = figures,
@@ -1740,16 +1741,12 @@ private fun RowCard(
                         )
                 },
             ),
-        // A phone's card is History's: its large shape, its fill, no edge but a chosen one.
+        // A phone's card is History's: its large shape, its fill, with a subtle hairline edge.
         shape = if (phone) MaterialTheme.shapes.large else RoundedCornerShape(Corner.Large),
-        // The same fill the Continue watching cards use, not the scheme's surfaceVariant: that
-        // one sits a shade above the window on a dark theme, so a screenful reads as pale panels
-        // floating on the background rather than as the app's own cards.
-        colors = CardDefaults.cardColors(containerColor = Tone.surface),
+        colors = CardDefaults.cardColors(containerColor = Tone.surfaceCard),
         border = when {
             accent != null -> BorderStroke(2.dp, accent)
-            phone -> null
-            else -> BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
+            else -> BorderStroke(com.tmplayer.ui.theme.TmTokens.Border.hairline, Tone.borderSubtle)
         },
     ) {
         // [CARD_PAD] on every device, the storage card's and the switch row's own figure, so the

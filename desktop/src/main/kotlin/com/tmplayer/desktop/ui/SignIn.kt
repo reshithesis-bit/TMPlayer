@@ -2,6 +2,7 @@ package com.tmplayer.desktop.ui
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -243,7 +244,8 @@ private fun QrPane(link: String, scanned: Boolean) {
                 Modifier
                     .size(QR_PLATE)
                     .clip(RoundedCornerShape(Corner.ExtraLarge))
-                    .background(Color.White),
+                    .background(Color.White)
+                    .border(com.tmplayer.ui.theme.TmTokens.Border.hairline, Tone.borderSubtle, RoundedCornerShape(Corner.ExtraLarge)),
                 contentAlignment = Alignment.Center,
             ) {
                 val rendered = bitmap
@@ -320,13 +322,13 @@ private fun QrStep(number: Int, text: String) {
             Modifier
                 .size(28.dp)
                 .clip(CircleShape)
-                .background(MaterialTheme.colorScheme.primaryContainer),
+                .background(Tone.accent.copy(alpha = 0.16f)),
             contentAlignment = Alignment.Center,
         ) {
             Text(
                 "$number",
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                style = MaterialTheme.typography.bodyMedium.copy(fontWeight = androidx.compose.ui.text.font.FontWeight.Bold),
+                color = Tone.accent,
             )
         }
         Text(text, style = MaterialTheme.typography.bodyLarge)

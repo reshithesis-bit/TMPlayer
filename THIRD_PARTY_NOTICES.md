@@ -261,6 +261,14 @@ under permissive licences. The OpenSSL each platform links is listed in its own 
 The Gradle wrapper scripts are provided under Apache License 2.0. Test-only dependencies are not
 packaged in any build.
 
+### NuvioMobile Design Patterns and Tokens
+
+- Author: tapframe and contributors
+- Licence: GNU General Public License version 3
+- Source: <https://github.com/tapframe/NuvioMobile>
+
+UI/UX design patterns, dark OLED surfaces, hairline subtle borders, active accent indicators, and card styling adapted under GPL-3.0.
+
 ## Data from online services
 
 Nothing below ships in a build: it is looked up while online metadata is on, cached on the device

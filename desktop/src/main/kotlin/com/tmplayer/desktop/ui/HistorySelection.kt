@@ -105,7 +105,13 @@ internal fun HistorySelectionBar(
     val s = LocalStrings.current
     val count = selection.ids.count { it in allIds }
     val all = count == allIds.size
-    Surface(shape = MaterialTheme.shapes.large, color = Tone.surfaceHigh, tonalElevation = 6.dp, modifier = modifier) {
+    Surface(
+        shape = MaterialTheme.shapes.large,
+        color = Tone.surfaceCard,
+        border = androidx.compose.foundation.BorderStroke(com.tmplayer.ui.theme.TmTokens.Border.hairline, Tone.borderSubtle),
+        tonalElevation = 6.dp,
+        modifier = modifier,
+    ) {
         Row(
             Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
             verticalAlignment = Alignment.CenterVertically,
