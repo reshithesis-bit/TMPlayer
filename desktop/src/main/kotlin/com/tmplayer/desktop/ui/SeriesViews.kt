@@ -44,7 +44,9 @@ import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.input.key.type
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import com.tmplayer.ui.theme.TmTokens
 import androidx.compose.ui.unit.dp
 import com.tmplayer.data.OfflineDownloads
 import com.tmplayer.data.Series
@@ -163,19 +165,26 @@ internal fun SeriesPoster(
         behaviour,
         verticalArrangement = Arrangement.spacedBy(6.dp),
     ) {
+        val cardShape = MaterialTheme.shapes.medium
         Box(
             Modifier
                 .fillMaxWidth()
                 .graphicsLayer { scaleX = scale; scaleY = scale }
-                .then(if (focused) Modifier.border(com.tmplayer.ui.theme.Focus.Ring, Tone.accent, MaterialTheme.shapes.medium) else Modifier),
+                .clip(cardShape)
+                .background(Tone.surfaceCard)
+                .border(
+                    if (focused) com.tmplayer.ui.theme.Focus.Ring else TmTokens.Border.hairline,
+                    if (focused) Tone.accent else Tone.borderSubtle,
+                    cardShape,
+                ),
         ) {
             SeriesArt(series, progress, Modifier.fillMaxWidth(), poster = poster, fresh = remember(series, watch) { watch.newEpisodes(series) > 0 })
         }
         // The poster's own lines (see Poster), so a show sits level with the videos beside it.
         if (poster) {
-            Text(series.title, style = MaterialTheme.typography.bodyMedium, maxLines = 2, minLines = 2, overflow = TextOverflow.Ellipsis)
+            Text(series.title, style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.SemiBold), maxLines = 2, minLines = 2, overflow = TextOverflow.Ellipsis)
         } else {
-            Text(series.title, style = MaterialTheme.typography.titleSmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            Text(series.title, style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.SemiBold), maxLines = 1, overflow = TextOverflow.Ellipsis)
         }
         Text(
             listOfNotNull(seriesSummary(series), seriesProgressLine(progress)).joinToString("  ·  "),

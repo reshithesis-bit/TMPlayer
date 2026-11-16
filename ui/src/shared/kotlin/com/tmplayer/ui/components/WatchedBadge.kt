@@ -81,6 +81,7 @@ fun TileBadge(
             // A rounded fill rather than a clip and a fill: a clip is a layer of its own for each
             // badge, and the words inside stay within the pill either way.
             .background(fill, CircleShape)
+            .border(0.5.dp, Color.White.copy(alpha = 0.16f), CircleShape)
             .padding(start = if (icon != null) 5.dp else 8.dp, end = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(4.dp),

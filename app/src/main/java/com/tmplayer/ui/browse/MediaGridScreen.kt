@@ -102,6 +102,7 @@ import androidx.compose.ui.layout.findRootCoordinates
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
@@ -2236,6 +2237,7 @@ internal fun VideoTile(
                     this.shape = shape
                     clip = true
                 }
+                .background(Tone.surfaceCard)
                 .then(if (touch) Modifier.indication(interactions, LocalIndication.current) else Modifier)
                 .then(ring)
                 .selectionEdge(selected, shape),
@@ -2250,7 +2252,7 @@ internal fun VideoTile(
         } else if (touch) {
             M3Text(
                 title,
-                style = if (poster) M3MaterialTheme.typography.bodyMedium else M3MaterialTheme.typography.titleSmall,
+                style = (if (poster) M3MaterialTheme.typography.bodyMedium else M3MaterialTheme.typography.titleSmall).copy(fontWeight = FontWeight.SemiBold),
                 color = Tone.text,
                 maxLines = lines,
                 minLines = lines,
@@ -2259,7 +2261,7 @@ internal fun VideoTile(
         } else {
             Text(
                 title,
-                style = if (poster) MaterialTheme.typography.bodyMedium else MaterialTheme.typography.titleMedium,
+                style = (if (poster) MaterialTheme.typography.bodyMedium else MaterialTheme.typography.titleMedium).copy(fontWeight = FontWeight.SemiBold),
                 color = Tone.text,
                 maxLines = lines,
                 minLines = lines,

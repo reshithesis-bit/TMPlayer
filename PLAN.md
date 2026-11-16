@@ -160,4 +160,25 @@ Each phase will be verified using:
   - TV: Top bar navigation with clear D-pad focus scaling and accent highlight.
   - Home empty states: Test with empty library / no chosen chats to verify Nuvio dark surface cards.
 
-Next step: Wait for user confirmation to begin Phase 3 (Media browser and cards).
+### Phase 3 Status: Complete
+- Media browser and cards redesign implemented across form factors:
+  - Video and poster cards: Redesigned `Poster` in `desktop/ui/MediaGrid.kt` and `VideoTile` in `app/ui/browse/MediaGridScreen.kt` with deep dark OLED surface (`Tone.surfaceCard`), subtle hairline border (`TmTokens.Border.hairline` with `Tone.borderSubtle`), and accent glow on focus/selection.
+  - Video typography: Enhanced title and metadata hierarchy with `FontWeight.SemiBold`, responsive font sizing, and dynamic color transitions on hover/focus.
+  - Progress bar: Upgraded `ProgressLine` with rounded capsule endpoints (`drawRoundRect` with `size.height / 2f` corner radius) and accent fill for clean Nuvio watch progress indication.
+  - Glassmorphic badges: Refined `TileBadge` with subtle hairline border (`Color.White.copy(alpha = 0.16f)`) and dark translucent fill.
+  - Media thumbnail fallbacks: Updated `MediaArt` and `PosterArt` to guarantee an attractive dark placeholder (`Tone.surfaceCard` with `PlayCircle` icon) when neither Telegram thumbnail nor online cover is present.
+  - Series poster: Modernized `SeriesPoster` in `desktop/ui/SeriesViews.kt` with matching card styling and hairline borders.
+  - Search results: Updated `SearchResultCard` and `ResultPoster` with `Tone.surfaceCard`, hairline borders, and semi-bold typography.
+  - Dialog and sheet floating borders: Updated `floatingBorder()` in `ui/theme/Surfaces.kt` to use `Tone.borderSubtle` in dark theme.
+- Machine Verification:
+  - `:desktop:compileKotlin` compiled cleanly with 0 errors.
+  - `:desktop:test` passed (including `TileRenderTest`, `BrowseRenderTest`, etc.).
+  - `:ui:jvmTest` passed cleanly.
+  - Em/en dash check: verified 0 instances of unicode dashes in modified files and docs.
+- Manual checklist:
+  - Card hover/focus: Hover on desktop card or navigate with TV remote to verify elevation, scale (1.05x), accent ring, and circular play button.
+  - Watch progress: Verify rounded capsule progress bar at bottom of partially watched media cards.
+  - Missing thumbnails: Check files with no thumbnail to verify clean Nuvio gradient / play icon fallback.
+  - Grid sorting and filters: Verify Sort menu (Newest, Oldest, Name, Longest, Size) and Filter options (All, Unwatched, In Progress, Watched, High Definition) in chat media grid.
+
+Next step: Wait for user confirmation to begin Phase 4 (Video details screen).

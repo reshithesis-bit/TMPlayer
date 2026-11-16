@@ -5,6 +5,10 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.size
+import androidx.compose.material3.Icon
+import androidx.compose.ui.unit.dp
+import com.tmplayer.ui.icons.TmIcons
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -108,7 +112,7 @@ fun MediaArt(
     val drawn = Motion.television || Thumbnails.light
     val shown: Any? = if (promo) Missing else full ?: mini?.bitmap ?: if (mini == null) null else Missing
     Box(
-        modifier.then(if (drawn && shown is ImageBitmap) Modifier else Modifier.background(Tone.surface)),
+        modifier.then(if (drawn && shown is ImageBitmap) Modifier else Modifier.background(Tone.surfaceCard)),
         contentAlignment = Alignment.Center,
     ) {
         // Nothing at all until the preview is decoded, and then no fade for the first picture: the
@@ -122,6 +126,19 @@ fun MediaArt(
                     when {
                         fallback != null -> fallback()
                         cover != null -> GeneratedCover(cover, Modifier.fillMaxSize(), compact = compactCover, showTitle = showCoverTitle)
+                        else -> Box(
+                            Modifier
+                                .fillMaxSize()
+                                .background(Tone.surfaceCard),
+                            contentAlignment = Alignment.Center,
+                        ) {
+                            Icon(
+                                TmIcons.PlayCircle,
+                                contentDescription = null,
+                                tint = Tone.muted.copy(alpha = 0.4f),
+                                modifier = Modifier.size(if (compactCover) 28.dp else 40.dp),
+                            )
+                        }
                     }
                 }
             }

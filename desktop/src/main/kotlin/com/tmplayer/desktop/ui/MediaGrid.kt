@@ -91,6 +91,7 @@ import androidx.compose.ui.layout.onSizeChanged
 import com.tmplayer.ui.components.FloatingChrome
 import com.tmplayer.ui.theme.FloatingTone
 import com.tmplayer.ui.theme.floatingBorder
+import com.tmplayer.ui.theme.TmTokens
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.PointerEventType
@@ -1047,14 +1048,20 @@ internal fun Poster(
         behaviour,
         verticalArrangement = Arrangement.spacedBy(4.dp),
     ) {
+        val cardShape = MaterialTheme.shapes.medium
         Box(
             Modifier
                 .padding(bottom = 4.dp)
                 .fillMaxWidth()
                 .aspectRatio(if (poster) 2f / 3f else 16f / 9f)
                 .graphicsLayer { scaleX = scale; scaleY = scale }
-                .clip(MaterialTheme.shapes.medium)
-                .then(if (focused || selected) Modifier.border(Focus.Ring, Tone.accent, MaterialTheme.shapes.medium) else Modifier),
+                .clip(cardShape)
+                .background(Tone.surfaceCard)
+                .border(
+                    if (focused || selected) Focus.Ring else TmTokens.Border.hairline,
+                    if (focused || selected) Tone.accent else Tone.borderSubtle,
+                    cardShape,
+                ),
         ) {
             art()
             if (progress != null && progress > 0f) {
@@ -1134,9 +1141,9 @@ internal fun Poster(
         if (titleBelow) {
             val title = remember(item, poster, titleText) { titleText ?: if (poster) SeriesShelf.posterTitle(item) else SeriesShelf.tileTitle(item) }
             if (poster) {
-                Text(title, style = MaterialTheme.typography.bodyMedium, maxLines = 2, minLines = 2, overflow = TextOverflow.Ellipsis)
+                Text(title, style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.SemiBold), maxLines = 2, minLines = 2, overflow = TextOverflow.Ellipsis)
             } else {
-                Text(title, style = MaterialTheme.typography.titleSmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                Text(title, style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.SemiBold), maxLines = 1, overflow = TextOverflow.Ellipsis)
             }
         }
         Text(

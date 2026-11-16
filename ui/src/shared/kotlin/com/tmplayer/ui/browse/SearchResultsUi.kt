@@ -32,6 +32,7 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.clipPath
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.sp
@@ -62,6 +63,7 @@ import com.tmplayer.ui.icons.TmIcons
 import com.tmplayer.ui.online.rememberMeta
 import com.tmplayer.ui.theme.Corner
 import com.tmplayer.ui.theme.Motion
+import com.tmplayer.ui.theme.TmTokens
 import com.tmplayer.ui.theme.Tone
 
 // The search across every chat as the three platforms draw it (CP73): a result card, the chats
@@ -196,7 +198,7 @@ fun SearchResultCard(
     ) {
         ResultPoster(item, Modifier.width(posterWidth), fraction)
         Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(3.dp)) {
-            Text(title, style = MaterialTheme.typography.titleSmall, color = Tone.text, maxLines = 2, overflow = TextOverflow.Ellipsis)
+            Text(title, style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.SemiBold), color = Tone.text, maxLines = 2, overflow = TextOverflow.Ellipsis)
             if (facts.isNotEmpty()) {
                 Text(facts, style = MaterialTheme.typography.bodySmall, color = Tone.muted, maxLines = 1, overflow = TextOverflow.Ellipsis)
             }
@@ -220,7 +222,14 @@ fun SearchResultCard(
 @Composable
 fun ResultPoster(item: MediaItem, modifier: Modifier = Modifier, fraction: Float? = null) {
     val meta = rememberMeta(item)
-    Box(modifier.aspectRatio(2f / 3f).clip(RoundedCornerShape(Corner.Small))) {
+    val shape = RoundedCornerShape(Corner.Small)
+    Box(
+        modifier
+            .aspectRatio(2f / 3f)
+            .clip(shape)
+            .background(Tone.surfaceCard)
+            .border(TmTokens.Border.hairline, Tone.borderSubtle, shape),
+    ) {
         PosterArt(
             miniThumbnail = item.miniThumbnail,
             thumbnailFileId = item.thumbnailFileId,

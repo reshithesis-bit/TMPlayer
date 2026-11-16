@@ -847,7 +847,7 @@ private fun StripArrow(icon: ImageVector, label: String, modifier: Modifier, alp
                 .focusProperties { canFocus = false }
                 .clip(CircleShape)
                 .background(if (hovered) Tone.surfaceHigh else Tone.surfaceHigh.copy(alpha = 0.88f))
-                .border(1.dp, Tone.outline, CircleShape)
+                .border(1.dp, if (com.tmplayer.ui.theme.LocalDarkTheme.current) Tone.borderSubtle else Tone.outline, CircleShape)
                 .hoverable(interactions)
                 .clickable(interactionSource = interactions, indication = null, role = Role.Button, onClick = onClick),
             contentAlignment = Alignment.Center,

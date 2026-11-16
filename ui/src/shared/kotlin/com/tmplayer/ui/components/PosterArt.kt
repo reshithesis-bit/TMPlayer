@@ -111,7 +111,7 @@ fun PosterArt(
     var covered by remember(posterUrl) {
         mutableStateOf(tv && posterUrl != null && Thumbnails.peekSharp(posterUrl, POSTER_WIDTH, POSTER_WIDTH) != null)
     }
-    Box(if (covered) modifier else modifier.background(Tone.surface)) {
+    Box(if (covered) modifier else modifier.background(Tone.surfaceCard)) {
         // Each better picture fades in over the one before ([FadeOver]), never through the surface.
         if (picture != null && !covered) FadeOver(picture, Modifier.fillMaxSize()) { shown ->
             when {

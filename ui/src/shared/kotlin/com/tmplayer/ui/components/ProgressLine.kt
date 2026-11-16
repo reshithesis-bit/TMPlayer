@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.platform.LocalLayoutDirection
@@ -47,10 +48,11 @@ fun ProgressLine(
             .padding(PaddingValues(start = inset, end = inset, bottom = inset))
             .height(thickness),
     ) {
-        drawRect(track)
+        val corner = CornerRadius(size.height / 2f, size.height / 2f)
+        drawRoundRect(track, cornerRadius = corner)
         val width = size.width * done
         if (width > 0f) {
-            drawRect(fill, topLeft = Offset(if (rtl) size.width - width else 0f, 0f), size = Size(width, size.height))
+            drawRoundRect(fill, topLeft = Offset(if (rtl) size.width - width else 0f, 0f), size = Size(width, size.height), cornerRadius = corner)
         }
     }
 }

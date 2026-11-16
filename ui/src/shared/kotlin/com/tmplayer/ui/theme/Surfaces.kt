@@ -99,10 +99,10 @@ object FloatingTone {
             if (LocalOnFloating.current) M3.colorScheme.surfaceContainerHighest else M3.colorScheme.surfaceContainerHigh
 }
 
-/** The hairline round a floating surface, in the scheme's outline. */
+/** The hairline round a floating surface, subtle in dark theme and outline in light theme. */
 @Composable
 @ReadOnlyComposable
-fun floatingBorder(): BorderStroke = BorderStroke(Floating.Border, Tone.outline)
+fun floatingBorder(): BorderStroke = BorderStroke(Floating.Border, if (LocalDarkTheme.current) Tone.borderSubtle else Tone.outline)
 
 /**
  * A panel the app draws itself as a floating surface: clipped to [shape], filled with [fill] and
