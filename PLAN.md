@@ -220,4 +220,26 @@ Each phase will be verified using:
   - Track pickers & menu: Open audio, subtitle, and speed menus to verify clean floating panel with hairline borders.
   - Storyboard hover: Hover over timeline to check preview thumbnail card with clean hairline border.
 
-Next step: Wait for user confirmation to begin Phase 6 (Settings).
+### Phase 6 Status: Complete
+- **Date**: 2026-11-16
+- **What was changed**:
+  - `ChoiceRow.kt`: Updated `groupedCard` modifier to use `Tone.surfaceCard` background, `Tone.borderSubtle` hairline borders on both dark and light themes, and `Tone.borderSubtle` row dividers.
+  - `AppearancePreview.kt`: Modernized appearance live preview container with `Tone.surfaceCard` and `Tone.borderSubtle` hairline border.
+  - `SetupChoices.kt`: Upgraded `StepRow` setup choice cards to use `Tone.surfaceCard` and hairline subtle border.
+  - `SettingsRows.kt`: Redesigned `SettingsColumn` grouped cards with `Tone.surfaceCard` fill, `Tone.borderSubtle` inner dividers, and hairline subtle outer borders. Refined row hover, press, and active selection state with vibrant accent glow (`Tone.accent.copy(alpha = 0.14f..0.22f)`). Styled `Segments` segmented buttons with active accent container/text and subtle hairline borders. Modernized `RowButton` with rounded corners and subtle border.
+  - `Settings.kt`: Redesigned `AccountHeader` into an elevated Nuvio-styled profile card with `Tone.surfaceCard`, rounded corners, and hairline subtle border. Preserved full category navigation and individual preference controls across all categories.
+  - `StorageSettings.kt`: Styled `StorageCard` with `Tone.surfaceCard` and `Tone.borderSubtle` hairline border.
+  - `SettingsScreen.kt`: Modernized Android phone and TV settings rows. Upgraded `StorageCard` and `AccountHeader` with `Tone.surfaceCard` and hairline subtle border. Added TV focus highlight with `Tone.accent` border and `Tone.borderSubtle` idle state.
+- **Verification**:
+  - `:desktop:compileKotlin` passed.
+  - `:desktop:test --tests "com.tmplayer.desktop.ui.SettingsLayoutShotsTest" :desktop:test --tests "com.tmplayer.desktop.ui.SettingsModalTest"` passed (every settings page rendered cleanly at all screen sizes).
+  - `:ui:jvmTest` passed.
+- **Manual Verification Checklist**:
+  - Account Header: Verify account avatar, name, and username display in a clean dark card at the top of settings.
+  - Grouped Setting Cards: Verify rows are grouped into rounded cards with subtle hairline borders and dividers.
+  - Category List: Check sidebar category selection with active accent highlight and glowing indicator.
+  - Appearance Page: Check live appearance preview card, theme segments, pure black toggle, and accent swatches.
+  - Storage & Subtitles: Verify storage overview ring card and subtitle look preview dialog render with dark surface card styling.
+  - TV Focus Navigation: On TV layout, verify D-pad moves focus with clear accent ring and high-contrast text.
+
+Next step: Wait for user confirmation to begin Phase 7 (Remaining screens, polish, full test pass).

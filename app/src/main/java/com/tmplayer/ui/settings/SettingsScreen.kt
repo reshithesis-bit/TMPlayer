@@ -2915,10 +2915,11 @@ private fun StorageCard(
 ) {
     val s = LocalStrings.current
     val touch = isTouch()
+    val shape = if (touch) M3Theme.shapes.large else RoundedCornerShape(Corner.Large)
     Card(
-        modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = Tone.surface),
-        shape = if (touch) M3Theme.shapes.large else RoundedCornerShape(Corner.Large),
+        modifier = Modifier.fillMaxWidth().border(com.tmplayer.ui.theme.TmTokens.Border.hairline, Tone.borderSubtle, shape),
+        colors = CardDefaults.cardColors(containerColor = Tone.surfaceCard),
+        shape = shape,
     ) {
         Column(Modifier.padding(if (touch) 16.dp else 20.dp)) {
             com.tmplayer.ui.components.StorageOverview(
@@ -3147,12 +3148,19 @@ private fun previewShadow(style: SubtitleStyle): Shadow? = when {
 
 /**
  * The signed in account at the top of Settings, above the cards, from the start: the picture, with
- * the name and @username beside it.
+ * the name and @username beside it, in a Nuvio-styled card.
  */
 @Composable
 private fun AccountHeader(account: com.tmplayer.data.Account) {
+    val shape = RoundedCornerShape(Corner.Large)
     Row(
-        Modifier.fillMaxWidth().padding(top = 4.dp, bottom = 16.dp),
+        Modifier
+            .fillMaxWidth()
+            .padding(top = 4.dp, bottom = 12.dp)
+            .clip(shape)
+            .background(Tone.surfaceCard, shape)
+            .border(com.tmplayer.ui.theme.TmTokens.Border.hairline, Tone.borderSubtle, shape)
+            .padding(horizontal = 16.dp, vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(14.dp),
     ) {
@@ -3160,12 +3168,12 @@ private fun AccountHeader(account: com.tmplayer.data.Account) {
             miniThumbnail = account.miniThumbnail,
             thumbnailFileId = account.photoFileId,
             fallbackLabel = account.name,
-            modifier = Modifier.size(56.dp).clip(CircleShape),
+            modifier = Modifier.size(48.dp).clip(CircleShape),
         )
         Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
             Text(
                 account.name,
-                style = MaterialTheme.typography.titleMedium,
+                style = MaterialTheme.typography.titleMedium.copy(fontWeight = androidx.compose.ui.text.font.FontWeight.SemiBold),
                 color = Tone.text,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
@@ -3374,7 +3382,7 @@ private fun FocusRow(
     val interactions = remember { MutableInteractionSource() }
     val focused by interactions.collectIsFocusedAsState()
     val background by animateColorAsState(
-        targetValue = if (focused) Tone.focusFill else Tone.surface,
+        targetValue = if (focused) Tone.focusFill else Tone.surfaceCard,
         animationSpec = tween(140),
         label = "rowBackground",
     )
@@ -3404,6 +3412,7 @@ private fun FocusRow(
         return
     }
 
+    val tvShape = RoundedCornerShape(Corner.Large)
     Row(
         modifier
             .fillMaxWidth()
@@ -3412,8 +3421,12 @@ private fun FocusRow(
             // sentence off at the ellipsis.
             .heightIn(min = 64.dp)
             // The filled card is how the focused row is found from a sofa.
-            .clip(RoundedCornerShape(Corner.Large))
+            .clip(tvShape)
             .background(background)
+            .then(
+                if (focused) Modifier.border(com.tmplayer.ui.theme.TmTokens.Border.focus, Tone.accent, tvShape)
+                else Modifier.border(com.tmplayer.ui.theme.TmTokens.Border.hairline, Tone.borderSubtle, tvShape)
+            )
             .clickable(
                 interactionSource = interactions,
                 indication = null,

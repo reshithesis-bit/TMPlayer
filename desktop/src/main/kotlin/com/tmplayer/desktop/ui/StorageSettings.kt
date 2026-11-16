@@ -273,7 +273,12 @@ internal fun StorageCard(
     result: String? = null,
     onFreeUp: () -> Unit,
 ) {
-    Surface(shape = RoundedCornerShape(Corner.Large), color = Tone.surface, modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)) {
+    Surface(
+        shape = RoundedCornerShape(Corner.Large),
+        color = Tone.surfaceCard,
+        border = androidx.compose.foundation.BorderStroke(com.tmplayer.ui.theme.TmTokens.Border.hairline, Tone.borderSubtle),
+        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+    ) {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
             com.tmplayer.ui.components.StorageOverview(
                 figures = figures?.chart() ?: com.tmplayer.data.StorageChart.Figures(0, 0, 0, 0, 0, 0, 0),

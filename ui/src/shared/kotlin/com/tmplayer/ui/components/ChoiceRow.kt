@@ -179,9 +179,9 @@ fun Modifier.groupedCard(place: GroupPlace, dividerStart: Dp = SettingsDividerSt
     val top = if (place.first) Corner.Large else 0.dp
     val bottom = if (place.last) Corner.Large else 0.dp
     val shape = RoundedCornerShape(topStart = top, topEnd = top, bottomStart = bottom, bottomEnd = bottom)
-    val fill = Tone.surface
-    val line = Tone.outline
-    val hairline = !LocalDarkTheme.current
+    val fill = Tone.surfaceCard
+    val line = Tone.borderSubtle
+    val hairline = true
     val rtl = LocalLayoutDirection.current == LayoutDirection.Rtl
     // Only a rounded end clips its row: a clip is a layer, and a long list of square middle rows
     // made one each per row a TV (API 28) records through a View on every scroll (HX76).
@@ -190,7 +190,7 @@ fun Modifier.groupedCard(place: GroupPlace, dividerStart: Dp = SettingsDividerSt
         .background(fill, shape)
         .drawWithContent {
             drawContent()
-            val stroke = 1.dp.toPx()
+            val stroke = com.tmplayer.ui.theme.TmTokens.Border.hairline.toPx()
             if (!place.first) {
                 val inset = dividerStart.toPx()
                 val y = stroke / 2

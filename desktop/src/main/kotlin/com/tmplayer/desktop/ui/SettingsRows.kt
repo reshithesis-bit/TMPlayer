@@ -219,7 +219,7 @@ private fun Modifier.rowStates(interactions: MutableInteractionSource, shape: Sh
     val pressed by interactions.collectIsPressedAsState()
     val ring = keyboardFocused(interactions)
     val fill = when {
-        selected -> Tone.accent.copy(alpha = if (pressed) 0.20f else if (hovered) 0.16f else 0.12f)
+        selected -> Tone.accent.copy(alpha = if (pressed) 0.22f else if (hovered) 0.18f else 0.14f)
         pressed -> Tone.text.copy(alpha = 0.10f)
         hovered || ring -> Tone.text.copy(alpha = 0.06f)
         else -> Color.Transparent
@@ -350,6 +350,14 @@ internal fun <T> Segments(choices: List<T>, selected: T, label: @Composable (T) 
                 shape = shape,
                 interactionSource = interactions,
                 modifier = Modifier.keyboardRing(interactions, shape),
+                colors = SegmentedButtonDefaults.colors(
+                    activeContainerColor = Tone.accent,
+                    activeContentColor = Tone.onAccent,
+                    inactiveContainerColor = Tone.surfaceCard,
+                    inactiveContentColor = Tone.muted,
+                    activeBorderColor = Tone.borderSubtle,
+                    inactiveBorderColor = Tone.borderSubtle,
+                ),
             ) { Text(label(choice)) }
         }
     }
@@ -398,10 +406,12 @@ private fun RingIconButton(icon: ImageVector, description: String, enabled: Bool
 @Composable
 internal fun RowButton(label: String, enabled: Boolean = true, color: Color = Color.Unspecified, onClick: () -> Unit) {
     val interactions = remember { MutableInteractionSource() }
-    val shape = ButtonDefaults.outlinedShape
+    val shape = RoundedCornerShape(Corner.Medium)
     OutlinedButton(
         onClick = onClick,
         enabled = enabled,
+        shape = shape,
+        border = androidx.compose.foundation.BorderStroke(com.tmplayer.ui.theme.TmTokens.Border.hairline, Tone.borderSubtle),
         interactionSource = interactions,
         modifier = Modifier.keyboardRing(interactions, shape),
     ) { Text(label, color = color) }
@@ -424,9 +434,9 @@ private const val CLICK_FOCUS_NANOS = 300_000_000L
 
 /**
  * The settings page's column: the children stacked as a [Column] would, with each run of
- * consecutive [Setting] rows drawn as one grouped card on [Tone.surface] (rounded to
+ * consecutive [Setting] rows drawn as one grouped card on [Tone.surfaceCard] (rounded to
  * [Corner.Large], dividers between the rows inset by [dividerStart] to where their words start,
- * and in daylight a hairline round the outside). A [Group] label gets room above it and sits 8 dp
+ * and a subtle hairline round the outside). A [Group] label gets room above it and sits 8 dp
  * over its card; anything else (a note, the storage card, a progress line) sits 8 dp from its
  * neighbours and ends the card it follows.
  *
@@ -440,14 +450,14 @@ internal fun SettingsColumn(
     content: @Composable () -> Unit,
 ) {
     val cards = remember { mutableStateOf(emptyList<SettingsCard>()) }
-    val fill = Tone.surface
-    val line = Tone.outline
-    val hairline = !LocalDarkTheme.current
+    val fill = Tone.surfaceCard
+    val line = Tone.borderSubtle
+    val hairline = true
     Layout(
         content = content,
         modifier = modifier.drawBehind {
             val radius = CornerRadius(Corner.Large.toPx())
-            val stroke = 1.dp.toPx()
+            val stroke = com.tmplayer.ui.theme.TmTokens.Border.hairline.toPx()
             val inset = dividerStart.toPx()
             val rtl = layoutDirection == LayoutDirection.Rtl
             cards.value.forEach { card ->

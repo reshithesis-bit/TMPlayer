@@ -41,8 +41,8 @@ fun AppearancePreview(modifier: Modifier = Modifier) {
         modifier
             .fillMaxWidth()
             .clip(shape)
-            .background(Tone.surface)
-            .border(1.dp, Tone.outline, shape)
+            .background(Tone.surfaceCard)
+            .border(com.tmplayer.ui.theme.TmTokens.Border.hairline, Tone.borderSubtle, shape)
             .padding(12.dp)
             .clearAndSetSemantics {},
         horizontalArrangement = Arrangement.spacedBy(14.dp),

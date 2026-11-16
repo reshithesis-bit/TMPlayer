@@ -2,6 +2,7 @@ package com.tmplayer.desktop.ui
 
 import androidx.compose.foundation.VerticalScrollbar
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -720,21 +721,28 @@ private fun KidsChatsDialog(
 
 /**
  * The signed in account over the list, as the phone's Settings opens: the picture, with the name
- * and @username beside it, on the page's own ground rather than in a card.
+ * and @username beside it, in an elevated Nuvio card.
  */
 @Composable
 private fun AccountHeader(account: com.tmplayer.data.Account) {
+    val shape = RoundedCornerShape(com.tmplayer.ui.theme.Corner.Large)
     Row(
-        Modifier.fillMaxWidth().padding(start = SETTING_INSET, end = SETTING_INSET, top = 4.dp, bottom = 12.dp),
+        Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 4.dp, vertical = 6.dp)
+            .clip(shape)
+            .background(Tone.surfaceCard, shape)
+            .border(com.tmplayer.ui.theme.TmTokens.Border.hairline, Tone.borderSubtle, shape)
+            .padding(horizontal = 16.dp, vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(14.dp),
     ) {
-        ChatAvatar(account.miniThumbnail, account.photoFileId, account.name, 56.dp)
+        ChatAvatar(account.miniThumbnail, account.photoFileId, account.name, 48.dp)
         Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
-            Text(account.name, style = MaterialTheme.typography.titleMedium, color = Tone.text, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            Text(account.name, style = MaterialTheme.typography.titleMedium.copy(fontWeight = androidx.compose.ui.text.font.FontWeight.SemiBold), color = Tone.text, maxLines = 1, overflow = TextOverflow.Ellipsis)
             if (account.username.isNotBlank()) {
                 // Isolated left to right, or an Arabic or Persian interface draws "name@".
-                Text("⁦@${account.username}⁩", style = MaterialTheme.typography.bodyMedium, color = Tone.muted, maxLines = 1)
+                Text("\u2066@${account.username}\u2069", style = MaterialTheme.typography.bodyMedium, color = Tone.muted, maxLines = 1)
             }
         }
     }

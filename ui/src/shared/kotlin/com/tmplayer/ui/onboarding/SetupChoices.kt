@@ -3,6 +3,7 @@ package com.tmplayer.ui.onboarding
 import com.tmplayer.ui.theme.collectIsFocusVisibleAsState
 import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -185,7 +186,8 @@ private fun StepRow(
         Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(Corner.Large))
-            .background(Tone.surfaceHigh)
+            .background(Tone.surfaceCard)
+            .border(com.tmplayer.ui.theme.TmTokens.Border.hairline, Tone.borderSubtle, RoundedCornerShape(Corner.Large))
             .padding(14.dp)
             .testTag("setup-choice-${step.name}"),
         verticalArrangement = Arrangement.spacedBy(12.dp),
