@@ -3424,7 +3424,7 @@ private fun FocusRow(
             .clip(tvShape)
             .background(background)
             .then(
-                if (focused) Modifier.border(com.tmplayer.ui.theme.TmTokens.Border.focus, Tone.accent, tvShape)
+                if (focused) Modifier.border(com.tmplayer.ui.theme.TmTokens.Border.medium, Tone.accent, tvShape)
                 else Modifier.border(com.tmplayer.ui.theme.TmTokens.Border.hairline, Tone.borderSubtle, tvShape)
             )
             .clickable(

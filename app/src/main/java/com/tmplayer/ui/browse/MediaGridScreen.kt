@@ -225,7 +225,6 @@ import com.tmplayer.ui.theme.Motion
 import com.tmplayer.ui.theme.rememberReducedMotion
 import com.tmplayer.ui.components.PosterArt
 import com.tmplayer.data.MediaName
-import androidx.compose.ui.text.font.FontWeight
 
 /** A store that lives exactly as long as one media screen, so its view models are released with it. */
 private class MediaScreenStore : ViewModelStoreOwner {

@@ -179,7 +179,7 @@ fun NavFrame(
                     )
                 }
                 Box(Modifier.weight(1f).fillMaxSize().focusRequester(state.pageFocus).then(if (state.destination.isModal) Modifier.focusRestorer().focusGroup() else Modifier)) {
-                    CompositionLocalProvider(LocalBottomChrome provides 0.dp) {
+                    CompositionLocalProvider(LocalBottomChrome provides if (barShown) NavBarClearance else 0.dp) {
                         content()
                     }
                 }

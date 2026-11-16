@@ -73,6 +73,7 @@ object TmTokens {
         val hairline = 0.5.dp
         val thin = 1.dp
         val medium = 2.dp
+        val focus = medium
     }
 
     /** Elevation steps. */
