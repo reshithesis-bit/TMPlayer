@@ -14,6 +14,7 @@ import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.focusGroup
 import androidx.compose.foundation.focusable
@@ -21,9 +22,12 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.defaultMinSize
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -32,11 +36,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -86,8 +93,10 @@ import com.tmplayer.desktop.os.OsInfo
 import com.tmplayer.ui.browse.BrowseSection
 import com.tmplayer.ui.browse.BrowseTab
 import com.tmplayer.ui.browse.HistoryTab
+import com.tmplayer.ui.browse.ChatFilter
 import com.tmplayer.ui.browse.onChatsPage
 import com.tmplayer.ui.components.LocalBottomChrome
+import com.tmplayer.ui.components.TmNavItem
 import com.tmplayer.ui.components.captionStyle
 import com.tmplayer.ui.components.pressScale
 import com.tmplayer.ui.i18n.LocalStrings
@@ -98,7 +107,9 @@ import com.tmplayer.ui.theme.Motion
 import com.tmplayer.ui.theme.Tone
 import com.tmplayer.ui.theme.collectIsFocusVisibleAsState
 import com.tmplayer.ui.theme.floatingBorder
+import com.tmplayer.ui.theme.focusRing
 import com.tmplayer.ui.theme.rememberReducedMotion
+import com.tmplayer.ui.theme.TmTokens
 
 /**
  * The window's navigation, the phone's floating bar brought to the desktop: one rounded pill
@@ -125,48 +136,92 @@ fun NavFrame(
     barShown: Boolean = true,
     content: @Composable () -> Unit,
 ) {
-    // The big-screen mode (plan 8.7) puts the TV's bar across the top and the page under it. The
-    // page stays at the same place in the tree either way, so a change of layout keeps its state.
     val tv = BigScreen.on
     var pictureX by remember { mutableFloatStateOf(Float.NaN) }
-    Box(modifier.fillMaxSize()) {
-        Column(Modifier.fillMaxSize()) {
-            // The TV's bar is drawn over the page (in the overlay below), as the Android TV app
-            // does: this only keeps the page clear of it, except where Home's carousel runs up
-            // under it.
-            if (tv && barShown && !state.tvBar.overArt) Spacer(Modifier.fillMaxWidth().height(TV_BAR_HEIGHT))
-            // On a television, one focus group that remembers where the remote was: Down from the
-            // bar and the end of a video put it back on that item (ShellState.focusPage).
-            Box(Modifier.weight(1f).fillMaxWidth().focusRequester(state.pageFocus).then(if (tv || state.destination.isModal) Modifier.focusRestorer().focusGroup() else Modifier)) {
-                CompositionLocalProvider(LocalBottomChrome provides if (barShown && !tv) NavBarClearance else 0.dp) {
-                    content()
+    var pictureY by remember { mutableFloatStateOf(Float.NaN) }
+    BoxWithConstraints(modifier.fillMaxSize()) {
+        val useSidebar = !tv && maxHeight >= 400.dp
+        if (tv) {
+            Column(Modifier.fillMaxSize()) {
+                if (barShown && !state.tvBar.overArt) Spacer(Modifier.fillMaxWidth().height(TV_BAR_HEIGHT))
+                Box(Modifier.weight(1f).fillMaxWidth().focusRequester(state.pageFocus).then(if (state.destination.isModal) Modifier.focusRestorer().focusGroup() else Modifier)) {
+                    CompositionLocalProvider(LocalBottomChrome provides 0.dp) {
+                        content()
+                    }
                 }
             }
-        }
-        if (barShown) {
-            var frameX by remember { mutableFloatStateOf(0f) }
-            Box(Modifier.fillMaxSize().onGloballyPositioned { frameX = it.boundsInRoot().left }) {
-                if (tv) {
+            if (barShown) {
+                var frameX by remember { mutableFloatStateOf(0f) }
+                Box(Modifier.fillMaxSize().onGloballyPositioned { frameX = it.boundsInRoot().left }) {
                     TvTopBar(state, update, account, onPicturePlaced = { pictureX = it }, modifier = Modifier.align(Alignment.TopStart))
-                }
-                if (!tv) {
-                    NavBar(
+                    ProfilePopover(
                         state,
                         update,
-                        account,
-                        Modifier.align(Alignment.BottomCenter),
-                        onPicturePlaced = { pictureX = it },
+                        anchorX = with(LocalDensity.current) { (pictureX - frameX).toDp() },
+                        below = TV_BAR_HEIGHT,
                     )
                 }
+            } else {
+                LaunchedEffect(Unit) { state.profileOpen = false }
+            }
+        } else if (useSidebar) {
+            var frameX by remember { mutableFloatStateOf(0f) }
+            Row(Modifier.fillMaxSize().onGloballyPositioned { frameX = it.boundsInRoot().left }) {
+                if (barShown) {
+                    DesktopSidebar(
+                        state = state,
+                        update = update,
+                        account = account,
+                        onPicturePlaced = { x, y ->
+                            pictureX = x
+                            pictureY = y
+                        },
+                    )
+                }
+                Box(Modifier.weight(1f).fillMaxSize().focusRequester(state.pageFocus).then(if (state.destination.isModal) Modifier.focusRestorer().focusGroup() else Modifier)) {
+                    CompositionLocalProvider(LocalBottomChrome provides 0.dp) {
+                        content()
+                    }
+                }
+            }
+            if (barShown) {
                 ProfilePopover(
                     state,
                     update,
                     anchorX = with(LocalDensity.current) { (pictureX - frameX).toDp() },
-                    below = if (tv) TV_BAR_HEIGHT else null,
+                    sidebar = true,
                 )
+            } else {
+                LaunchedEffect(Unit) { state.profileOpen = false }
             }
         } else {
-            LaunchedEffect(Unit) { state.profileOpen = false }
+            Column(Modifier.fillMaxSize()) {
+                Box(Modifier.weight(1f).fillMaxWidth().focusRequester(state.pageFocus).then(if (state.destination.isModal) Modifier.focusRestorer().focusGroup() else Modifier)) {
+                    CompositionLocalProvider(LocalBottomChrome provides if (barShown) NavBarClearance else 0.dp) {
+                        content()
+                    }
+                }
+            }
+            if (barShown) {
+                var frameX by remember { mutableFloatStateOf(0f) }
+                Box(Modifier.fillMaxSize().onGloballyPositioned { frameX = it.boundsInRoot().left }) {
+                    NavBar(
+                        state,
+                        update,
+                        account,
+                        onPicturePlaced = { pictureX = it },
+                        modifier = Modifier.align(Alignment.BottomCenter),
+                    )
+                    ProfilePopover(
+                        state,
+                        update,
+                        anchorX = with(LocalDensity.current) { (pictureX - frameX).toDp() },
+                        sidebar = false,
+                    )
+                }
+            } else {
+                LaunchedEffect(Unit) { state.profileOpen = false }
+            }
         }
     }
 }
@@ -198,6 +253,301 @@ internal val CHOOSE_CHATS_SIZE = 40.dp
 
 /** The Choose chats button's key as the tooltips name it (ShellState.onPreviewKey). */
 internal val CHOOSE_CHATS_SHORTCUT = "${COMMAND}Shift+A"
+
+/**
+ * Nuvio-style persistent desktop sidebar: displays primary destinations
+ * (Home, Library, Chats, Channels, Continue Watching, History, Downloads, Settings)
+ * and search in an elevated sidebar at the left edge of the desktop window.
+ */
+@Composable
+fun DesktopSidebar(
+    state: ShellState,
+    update: NavUpdate?,
+    account: Account?,
+    modifier: Modifier = Modifier,
+    onPicturePlaced: (Float, Float) -> Unit = { _, _ -> },
+) {
+    val s = LocalStrings.current
+    val inFlight = rememberDownloadsInFlight()
+    val compact = state.settings.compactNav.collectAsState(initial = false).value
+    val width = if (compact) 72.dp else 220.dp
+
+    Surface(
+        modifier = modifier
+            .width(width)
+            .fillMaxHeight(),
+        color = Tone.surfaceCard,
+    ) {
+        Column(
+            Modifier
+                .fillMaxSize()
+                .border(BorderStroke(1.dp, Tone.borderSubtle))
+                .padding(vertical = 16.dp, horizontal = if (compact) 12.dp else 16.dp),
+            verticalArrangement = Arrangement.SpaceBetween,
+        ) {
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.spacedBy(4.dp),
+            ) {
+                if (!compact) {
+                    Box(Modifier.padding(start = 4.dp, bottom = 12.dp)) {
+                        com.tmplayer.ui.components.BrandLockup(
+                            size = com.tmplayer.ui.components.BrandSize(32.dp, 18.sp, 10.dp),
+                            layout = com.tmplayer.ui.components.BrandLayout.Row,
+                        )
+                    }
+                } else {
+                    Box(
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 12.dp),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        com.tmplayer.ui.components.BrandBadge()
+                    }
+                }
+
+                TmNavItem(
+                    label = s.commonSearch,
+                    icon = TmIcons.Search,
+                    selected = state.paletteOpen,
+                    onClick = { state.paletteOpen = !state.paletteOpen },
+                    compact = compact,
+                    horizontal = true,
+                )
+
+                Spacer(Modifier.height(4.dp))
+
+                TmNavItem(
+                    label = s.browseTabHome,
+                    icon = TmIcons.Home,
+                    selected = state.destination == Destination.Home && !state.paletteOpen && state.openChat == null,
+                    onClick = { state.go(Destination.Home) },
+                    compact = compact,
+                    horizontal = true,
+                )
+
+                TmNavItem(
+                    label = s.navFavourites,
+                    icon = TmIcons.Bookmark,
+                    selected = state.destination == Destination.Favourites && !state.paletteOpen && state.openChat == null,
+                    onClick = { state.go(Destination.Favourites) },
+                    compact = compact,
+                    horizontal = true,
+                )
+
+                TmNavItem(
+                    label = s.navChats,
+                    icon = TmIcons.Chats,
+                    selected = (state.destination == Destination.Chats || state.openChat != null) && state.chatFilter != ChatFilter.Channels && !state.paletteOpen,
+                    onClick = {
+                        state.chatFilter = ChatFilter.All
+                        val open = state.chatSection
+                        state.showChats(if (open.onChatsPage) open else BrowseSection.of(BrowseTab.Chats))
+                    },
+                    compact = compact,
+                    horizontal = true,
+                )
+
+                TmNavItem(
+                    label = s.browseFilterChannels,
+                    icon = TmIcons.Channel,
+                    selected = state.destination == Destination.Chats && state.chatFilter == ChatFilter.Channels && !state.paletteOpen && state.openChat == null,
+                    onClick = {
+                        state.chatFilter = ChatFilter.Channels
+                        state.showChats(BrowseSection.of(BrowseTab.Chats))
+                    },
+                    compact = compact,
+                    horizontal = true,
+                )
+
+                TmNavItem(
+                    label = s.browseTabContinue,
+                    icon = TmIcons.PlayCircle,
+                    selected = state.destination == Destination.History && state.historyTab == HistoryTab.Continue && !state.paletteOpen,
+                    onClick = { state.showHistory(HistoryTab.Continue) },
+                    compact = compact,
+                    horizontal = true,
+                )
+
+                TmNavItem(
+                    label = s.browseTabWatched,
+                    icon = TmIcons.History,
+                    selected = state.destination == Destination.History && state.historyTab == HistoryTab.Watched && !state.paletteOpen,
+                    onClick = { state.showHistory(HistoryTab.Watched) },
+                    compact = compact,
+                    horizontal = true,
+                )
+
+                TmNavItem(
+                    label = s.navDownloads,
+                    icon = TmIcons.Download,
+                    selected = state.destination == Destination.Downloads && !state.paletteOpen,
+                    badge = inFlight.takeIf { it > 0 }?.toString(),
+                    onClick = { state.go(Destination.Downloads) },
+                    compact = compact,
+                    horizontal = true,
+                )
+
+                TmNavItem(
+                    label = s.navSettings,
+                    icon = TmIcons.Settings,
+                    selected = state.destination == Destination.Settings && !state.paletteOpen,
+                    onClick = { state.go(Destination.Settings) },
+                    compact = compact,
+                    horizontal = true,
+                )
+            }
+
+            Box(
+                Modifier
+                    .fillMaxWidth()
+                    .padding(top = 8.dp)
+                    .onGloballyPositioned {
+                        val center = it.boundsInRoot().center
+                        onPicturePlaced(center.x, center.y)
+                    },
+            ) {
+                SidebarProfileButton(
+                    account = account,
+                    compact = compact,
+                    open = state.profileOpen,
+                    ringed = inProfile(state),
+                    badged = inFlight > 0 || update != null,
+                    onClick = { state.profileOpen = !state.profileOpen },
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun SidebarProfileButton(
+    account: Account?,
+    compact: Boolean,
+    open: Boolean,
+    ringed: Boolean,
+    badged: Boolean,
+    onClick: () -> Unit,
+) {
+    val interactions = remember { MutableInteractionSource() }
+    val focused by interactions.collectIsFocusVisibleAsState()
+    val shape = RoundedCornerShape(TmTokens.Radius.compactCard)
+    val ringColor by animateColorAsState(
+        if (ringed || open) Tone.accent else Color.Transparent,
+        Motion.standard(Motion.Fast),
+        label = "sidebarProfileRing",
+    )
+    val s = LocalStrings.current
+    val name = account?.name ?: s.navYou
+
+    if (compact) {
+        Box(
+            modifier = Modifier
+                .size(44.dp)
+                .pressScale(interactions)
+                .clip(shape)
+                .focusRing(focused, shape)
+                .clickable(
+                    interactionSource = interactions,
+                    indication = null,
+                    role = Role.Button,
+                    onClick = onClick,
+                )
+                .semantics {
+                    contentDescription = s.navProfile
+                    selected = ringed || open
+                },
+            contentAlignment = Alignment.Center,
+        ) {
+            Box(
+                Modifier.size(PICTURE + 6.dp).border(2.dp, ringColor, CircleShape),
+                contentAlignment = Alignment.Center,
+            ) {
+                if (account != null) {
+                    ChatAvatar(account.miniThumbnail, account.photoFileId, account.name, PICTURE)
+                } else {
+                    Box(
+                        Modifier.size(PICTURE).clip(CircleShape).background(MaterialTheme.colorScheme.surfaceContainerHighest),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        Icon(TmIcons.Account, contentDescription = null, tint = Tone.muted, modifier = Modifier.size(PICTURE * 0.7f))
+                    }
+                }
+            }
+            if (badged) {
+                Box(
+                    Modifier
+                        .align(Alignment.TopEnd)
+                        .padding(2.dp)
+                        .size(8.dp)
+                        .clip(CircleShape)
+                        .background(Tone.caution),
+                )
+            }
+        }
+    } else {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .defaultMinSize(minHeight = 44.dp)
+                .pressScale(interactions)
+                .clip(shape)
+                .background(if (open || ringed) Tone.accent.copy(alpha = 0.16f) else Color.Transparent)
+                .focusRing(focused, shape)
+                .clickable(
+                    interactionSource = interactions,
+                    indication = null,
+                    role = Role.Button,
+                    onClick = onClick,
+                )
+                .semantics {
+                    contentDescription = s.navProfile
+                    selected = ringed || open
+                }
+                .padding(horizontal = 12.dp, vertical = 8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+        ) {
+            Box(
+                Modifier.size(PICTURE + 6.dp).border(2.dp, ringColor, CircleShape),
+                contentAlignment = Alignment.Center,
+            ) {
+                if (account != null) {
+                    ChatAvatar(account.miniThumbnail, account.photoFileId, account.name, PICTURE)
+                } else {
+                    Box(
+                        Modifier.size(PICTURE).clip(CircleShape).background(MaterialTheme.colorScheme.surfaceContainerHighest),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        Icon(TmIcons.Account, contentDescription = null, tint = Tone.muted, modifier = Modifier.size(PICTURE * 0.7f))
+                    }
+                }
+                if (badged) {
+                    Box(
+                        Modifier
+                            .align(Alignment.TopEnd)
+                            .size(8.dp)
+                            .clip(CircleShape)
+                            .background(Tone.caution)
+                            .border(1.5.dp, Tone.surfaceCard, CircleShape),
+                    )
+                }
+            }
+            Text(
+                name,
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = if (open || ringed) FontWeight.SemiBold else FontWeight.Medium,
+                color = if (open || ringed) Tone.accent else Tone.text,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.weight(1f),
+            )
+        }
+    }
+}
 
 @Composable
 private fun NavBar(
@@ -444,7 +794,13 @@ internal fun TipIconButton(
  * rows, and focus starts on the first.
  */
 @Composable
-private fun BoxScope.ProfilePopover(state: ShellState, update: NavUpdate?, anchorX: Dp, below: Dp? = null) {
+private fun BoxScope.ProfilePopover(
+    state: ShellState,
+    update: NavUpdate?,
+    anchorX: Dp,
+    below: Dp? = null,
+    sidebar: Boolean = false,
+) {
     val s = LocalStrings.current
     val open = state.profileOpen
     val reduced = rememberReducedMotion() || Motion.reduced
@@ -462,14 +818,18 @@ private fun BoxScope.ProfilePopover(state: ShellState, update: NavUpdate?, ancho
     val watchedVideos by state.watched.watched.collectAsState(initial = emptyMap())
     val inFlight = rememberDownloadsInFlight()
     val half = POPOVER_WIDTH / 2
-    // Over the floating bar at the foot, or hanging under the TV's bar at the top (plan 8.7).
-    val origin = TransformOrigin(0.5f, if (below != null) 0f else 1f)
-    Box(
+    val origin = if (sidebar) TransformOrigin(0f, 1f) else TransformOrigin(0.5f, if (below != null) 0f else 1f)
+    val popoverModifier = if (sidebar) {
+        Modifier
+            .align(Alignment.BottomStart)
+            .padding(start = if (anchorX.value.isNaN()) 228.dp else (anchorX + 16.dp).coerceAtLeast(8.dp), bottom = 16.dp)
+    } else {
         Modifier
             .align(if (below != null) Alignment.TopStart else Alignment.BottomStart)
             .padding(top = below?.plus(4.dp) ?: 0.dp, bottom = if (below != null) 0.dp else NAV_MARGIN + NAV_HEIGHT + 8.dp)
-            .offset(x = if (anchorX.value.isNaN()) 0.dp else (anchorX - half).coerceAtLeast(8.dp)),
-    ) {
+            .offset(x = if (anchorX.value.isNaN()) 0.dp else (anchorX - half).coerceAtLeast(8.dp))
+    }
+    Box(popoverModifier) {
         AnimatedVisibility(
             visible = open,
             enter = if (reduced) fadeIn(Motion.standard(0)) else fadeIn(Motion.standard(Motion.Fast)) +

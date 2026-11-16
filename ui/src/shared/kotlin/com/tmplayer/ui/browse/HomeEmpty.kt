@@ -25,13 +25,15 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.tmplayer.ui.components.EmptyArt
+import com.tmplayer.ui.components.TmSurfaceCard
 import com.tmplayer.ui.components.isTouch
 import com.tmplayer.ui.icons.TmIcons
 import com.tmplayer.ui.theme.Corner
+import com.tmplayer.ui.theme.TmTokens
 import com.tmplayer.ui.theme.Tone
 
 /**
- * Home with nothing in it yet: one card on [Tone.surface] that says how to get a first video in.
+ * Home with nothing in it yet: one card on [Tone.surfaceCard] that says how to get a first video in.
  * The empty pages' picture ([EmptyArt]), the heading, [body] (where to forward a video), and when there is
  * somewhere to send the viewer, a bright pill ([HeroPill]), [button], which takes
  * the remote's focus through [focus]. Under a rule, the line on starring chats, with its own chip.
@@ -50,52 +52,58 @@ fun FirstVideoCard(
     focus: FocusRequester? = null,
 ) {
     val touch = isTouch()
-    Column(
-        modifier
-            .widthIn(max = if (touch) 480.dp else 600.dp)
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(Corner.ExtraLarge))
-            .background(Tone.surface)
-            .padding(horizontal = if (touch) 20.dp else 32.dp, vertical = if (touch) 24.dp else 32.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(if (touch) 12.dp else 16.dp),
+    TmSurfaceCard(
+        modifier = modifier.widthIn(max = if (touch) 480.dp else 600.dp),
+        shape = RoundedCornerShape(TmTokens.Radius.card),
+        backgroundColor = Tone.surfaceCard,
+        borderColor = Tone.borderSubtle,
+        contentPadding = androidx.compose.foundation.layout.PaddingValues(
+            horizontal = if (touch) 24.dp else 36.dp,
+            vertical = if (touch) 28.dp else 36.dp,
+        ),
     ) {
-        EmptyArt(TmIcons.Bookmark, size = if (touch) 72.dp else 88.dp)
-        Text(
-            title,
-            style = (if (touch) MaterialTheme.typography.headlineSmall else MaterialTheme.typography.headlineMedium)
-                .copy(fontWeight = FontWeight.Bold),
-            color = Tone.text,
-            textAlign = TextAlign.Center,
-        )
-        Text(
-            body,
-            style = if (touch) MaterialTheme.typography.bodyLarge else MaterialTheme.typography.titleMedium,
-            color = Tone.muted,
-            textAlign = TextAlign.Center,
-        )
-        if (button != null) {
-            HeroPill(
-                label = button,
-                onClick = onButton,
-                focus = focus,
-                icon = null,
-                modifier = Modifier.padding(top = 4.dp),
-            )
-        }
-        HorizontalDivider(color = Tone.outline, modifier = Modifier.padding(top = 8.dp))
-        Row(
-            Modifier.fillMaxWidth().padding(top = 4.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(if (touch) 14.dp else 18.dp),
         ) {
-            IconChip(TmIcons.StarOutline)
+            EmptyArt(TmIcons.Bookmark, size = if (touch) 72.dp else 88.dp)
             Text(
-                more,
-                style = if (touch) MaterialTheme.typography.bodyMedium else MaterialTheme.typography.bodyLarge,
-                color = Tone.muted,
-                modifier = Modifier.weight(1f),
+                title,
+                style = (if (touch) MaterialTheme.typography.headlineSmall else MaterialTheme.typography.headlineMedium)
+                    .copy(fontWeight = FontWeight.Bold),
+                color = Tone.text,
+                textAlign = TextAlign.Center,
             )
+            Text(
+                body,
+                style = if (touch) MaterialTheme.typography.bodyLarge else MaterialTheme.typography.titleMedium,
+                color = Tone.muted,
+                textAlign = TextAlign.Center,
+            )
+            if (button != null) {
+                HeroPill(
+                    label = button,
+                    onClick = onButton,
+                    focus = focus,
+                    icon = null,
+                    modifier = Modifier.padding(top = 4.dp),
+                )
+            }
+            HorizontalDivider(color = Tone.borderSubtle, modifier = Modifier.padding(top = 8.dp))
+            Row(
+                Modifier.fillMaxWidth().padding(top = 4.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+            ) {
+                IconChip(TmIcons.StarOutline)
+                Text(
+                    more,
+                    style = if (touch) MaterialTheme.typography.bodyMedium else MaterialTheme.typography.bodyLarge,
+                    color = Tone.muted,
+                    modifier = Modifier.weight(1f),
+                )
+            }
         }
     }
 }
@@ -108,23 +116,29 @@ fun FirstVideoCard(
 @Composable
 fun FavouritesHintCard(text: String, start: Dp, end: Dp, modifier: Modifier = Modifier) {
     val touch = isTouch()
-    Row(
-        modifier
-            .fillMaxWidth()
-            .padding(start = start, end = end)
-            .clip(RoundedCornerShape(Corner.Large))
-            .background(Tone.surface)
-            .padding(horizontal = 16.dp, vertical = if (touch) 14.dp else 18.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(if (touch) 14.dp else 18.dp),
+    TmSurfaceCard(
+        modifier = modifier.padding(start = start, end = end),
+        shape = RoundedCornerShape(TmTokens.Radius.compactCard),
+        backgroundColor = Tone.surfaceCard,
+        borderColor = Tone.borderSubtle,
+        contentPadding = androidx.compose.foundation.layout.PaddingValues(
+            horizontal = 16.dp,
+            vertical = if (touch) 14.dp else 18.dp,
+        ),
     ) {
-        IconChip(TmIcons.StarOutline, size = if (touch) 36.dp else 44.dp)
-        Text(
-            text,
-            style = if (touch) MaterialTheme.typography.bodyMedium else MaterialTheme.typography.bodyLarge,
-            color = Tone.muted,
-            modifier = Modifier.weight(1f),
-        )
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(if (touch) 14.dp else 18.dp),
+        ) {
+            IconChip(TmIcons.StarOutline, size = if (touch) 36.dp else 44.dp)
+            Text(
+                text,
+                style = if (touch) MaterialTheme.typography.bodyMedium else MaterialTheme.typography.bodyLarge,
+                color = Tone.muted,
+                modifier = Modifier.weight(1f),
+            )
+        }
     }
 }
 
@@ -137,31 +151,37 @@ fun FavouritesHintCard(text: String, start: Dp, end: Dp, modifier: Modifier = Mo
 fun HomeOffCard(onSettings: () -> Unit, modifier: Modifier = Modifier, focus: FocusRequester? = null) {
     val s = com.tmplayer.ui.i18n.LocalStrings.current
     val touch = isTouch()
-    Column(
-        modifier
-            .widthIn(max = if (touch) 480.dp else 600.dp)
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(Corner.ExtraLarge))
-            .background(Tone.surface)
-            .padding(horizontal = if (touch) 20.dp else 32.dp, vertical = if (touch) 24.dp else 32.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(if (touch) 12.dp else 16.dp),
+    TmSurfaceCard(
+        modifier = modifier.widthIn(max = if (touch) 480.dp else 600.dp),
+        shape = RoundedCornerShape(TmTokens.Radius.card),
+        backgroundColor = Tone.surfaceCard,
+        borderColor = Tone.borderSubtle,
+        contentPadding = androidx.compose.foundation.layout.PaddingValues(
+            horizontal = if (touch) 24.dp else 36.dp,
+            vertical = if (touch) 28.dp else 36.dp,
+        ),
     ) {
-        EmptyArt(TmIcons.Home, size = if (touch) 72.dp else 88.dp)
-        Text(
-            s.homeOffTitle,
-            style = (if (touch) MaterialTheme.typography.headlineSmall else MaterialTheme.typography.headlineMedium)
-                .copy(fontWeight = FontWeight.Bold),
-            color = Tone.text,
-            textAlign = TextAlign.Center,
-        )
-        Text(
-            s.homeOffBody,
-            style = if (touch) MaterialTheme.typography.bodyLarge else MaterialTheme.typography.titleMedium,
-            color = Tone.muted,
-            textAlign = TextAlign.Center,
-        )
-        HeroPill(label = s.homeOpenSettings, onClick = onSettings, focus = focus, icon = TmIcons.Settings, modifier = Modifier.padding(top = 4.dp))
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(if (touch) 14.dp else 18.dp),
+        ) {
+            EmptyArt(TmIcons.Home, size = if (touch) 72.dp else 88.dp)
+            Text(
+                s.homeOffTitle,
+                style = (if (touch) MaterialTheme.typography.headlineSmall else MaterialTheme.typography.headlineMedium)
+                    .copy(fontWeight = FontWeight.Bold),
+                color = Tone.text,
+                textAlign = TextAlign.Center,
+            )
+            Text(
+                s.homeOffBody,
+                style = if (touch) MaterialTheme.typography.bodyLarge else MaterialTheme.typography.titleMedium,
+                color = Tone.muted,
+                textAlign = TextAlign.Center,
+            )
+            HeroPill(label = s.homeOpenSettings, onClick = onSettings, focus = focus, icon = TmIcons.Settings, modifier = Modifier.padding(top = 4.dp))
+        }
     }
 }
 
@@ -175,25 +195,31 @@ fun HomeOffCard(onSettings: () -> Unit, modifier: Modifier = Modifier, focus: Fo
 fun HomeNoneChosenCard(start: Dp, end: Dp, modifier: Modifier = Modifier, focus: FocusRequester? = null, onAddChats: () -> Unit = { AddChatsRequest.ask() }) {
     val s = com.tmplayer.ui.i18n.LocalStrings.current
     val touch = isTouch()
-    Column(
-        modifier
-            .fillMaxWidth()
-            .padding(start = start, end = end)
-            .clip(RoundedCornerShape(Corner.Large))
-            .background(Tone.surface)
-            .padding(horizontal = 16.dp, vertical = if (touch) 14.dp else 18.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp),
+    TmSurfaceCard(
+        modifier = modifier.padding(start = start, end = end),
+        shape = RoundedCornerShape(TmTokens.Radius.compactCard),
+        backgroundColor = Tone.surfaceCard,
+        borderColor = Tone.borderSubtle,
+        contentPadding = androidx.compose.foundation.layout.PaddingValues(
+            horizontal = 16.dp,
+            vertical = if (touch) 14.dp else 18.dp,
+        ),
     ) {
-        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(if (touch) 14.dp else 18.dp)) {
-            IconChip(TmIcons.ChatsMany, size = if (touch) 36.dp else 44.dp)
-            Text(
-                s.homeNoneAddedChosen,
-                style = if (touch) MaterialTheme.typography.bodyMedium else MaterialTheme.typography.bodyLarge,
-                color = Tone.muted,
-                modifier = Modifier.weight(1f),
-            )
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(if (touch) 14.dp else 18.dp)) {
+                IconChip(TmIcons.ChatsMany, size = if (touch) 36.dp else 44.dp)
+                Text(
+                    s.homeNoneAddedChosen,
+                    style = if (touch) MaterialTheme.typography.bodyMedium else MaterialTheme.typography.bodyLarge,
+                    color = Tone.muted,
+                    modifier = Modifier.weight(1f),
+                )
+            }
+            HeroPill(label = s.pickerChooseChats, onClick = onAddChats, focus = focus, icon = TmIcons.PersonAdd)
         }
-        HeroPill(label = s.pickerChooseChats, onClick = onAddChats, focus = focus, icon = TmIcons.PersonAdd)
     }
 }
 

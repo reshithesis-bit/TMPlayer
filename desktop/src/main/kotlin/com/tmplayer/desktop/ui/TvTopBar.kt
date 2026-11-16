@@ -246,11 +246,19 @@ private fun TvTab(label: String, icon: ImageVector, selected: Boolean, modifier:
         Motion.standard(Motion.Fast),
         label = "tvTabScale",
     )
-    val fill by animateColorAsState(if (focused) Tone.focusFill else Color.Transparent, Motion.standard(Motion.Fast), label = "tvTabFill")
+    val fill by animateColorAsState(
+        when {
+            focused -> Tone.focusFill
+            selected -> Tone.accent.copy(alpha = 0.16f)
+            else -> Color.Transparent
+        },
+        Motion.standard(Motion.Fast),
+        label = "tvTabFill",
+    )
     val ink by animateColorAsState(
         when {
             focused -> Tone.onFocusFill
-            selected -> Tone.text
+            selected -> Tone.accent
             else -> Tone.muted
         },
         Motion.standard(Motion.Fast),

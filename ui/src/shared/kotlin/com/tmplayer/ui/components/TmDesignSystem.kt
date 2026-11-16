@@ -44,7 +44,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -464,6 +466,119 @@ fun TmProgressBar(
                 .clip(CircleShape)
                 .background(fillColor),
         )
+    }
+}
+
+/**
+ * Navigation item for desktop sidebar, phone bottom nav, and TV focusable rail.
+ * Adopts Nuvio styling with rounded pill highlight, smooth scale, and active accent glow.
+ */
+@Composable
+fun TmNavItem(
+    icon: ImageVector,
+    label: String,
+    selected: Boolean,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    badge: String? = null,
+    compact: Boolean = false,
+    horizontal: Boolean = true,
+) {
+    val interactions = remember { MutableInteractionSource() }
+    val focused by interactions.collectIsFocusVisibleAsState()
+    val shape = RoundedCornerShape(TmTokens.Radius.lg)
+    val background = when {
+        selected -> Tone.accent.copy(alpha = TmTokens.Opacity.selected)
+        focused -> Tone.accent.copy(alpha = TmTokens.Opacity.hover)
+        else -> Color.Transparent
+    }
+    val contentColor = when {
+        selected -> Tone.accent
+        focused -> Tone.text
+        else -> Tone.muted
+    }
+
+    if (horizontal && !compact) {
+        Row(
+            modifier = modifier
+                .fillMaxWidth()
+                .defaultMinSize(minHeight = 44.dp)
+                .pressScale(interactions)
+                .clip(shape)
+                .background(background)
+                .focusRing(focused, shape)
+                .clickable(
+                    interactionSource = interactions,
+                    indication = null,
+                    role = Role.Tab,
+                    onClick = onClick,
+                )
+                .semantics {
+                    contentDescription = label
+                    this.selected = selected
+                    this.role = Role.Tab
+                }
+                .padding(horizontal = TmTokens.Space.s12, vertical = TmTokens.Space.s10),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(TmTokens.Space.s12),
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                tint = contentColor,
+                modifier = Modifier.size(20.dp),
+            )
+            Text(
+                text = label,
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Medium,
+                color = contentColor,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.weight(1f),
+            )
+            if (badge != null) {
+                TmBadge(text = badge)
+            }
+        }
+    } else {
+        Box(
+            modifier = modifier
+                .size(44.dp)
+                .pressScale(interactions)
+                .clip(shape)
+                .background(background)
+                .focusRing(focused, shape)
+                .clickable(
+                    interactionSource = interactions,
+                    indication = null,
+                    role = Role.Tab,
+                    onClick = onClick,
+                )
+                .semantics {
+                    contentDescription = label
+                    this.selected = selected
+                    this.role = Role.Tab
+                },
+            contentAlignment = Alignment.Center,
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = label,
+                tint = contentColor,
+                modifier = Modifier.size(22.dp),
+            )
+            if (badge != null) {
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .padding(TmTokens.Space.s2)
+                        .size(8.dp)
+                        .clip(CircleShape)
+                        .background(Tone.caution),
+                )
+            }
+        }
     }
 }
 

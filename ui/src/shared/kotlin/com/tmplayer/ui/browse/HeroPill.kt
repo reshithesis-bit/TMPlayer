@@ -33,6 +33,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.tmplayer.ui.components.isTouch
+import com.tmplayer.ui.components.pressScale
 import com.tmplayer.ui.icons.TmIcons
 import com.tmplayer.ui.theme.Motion
 import com.tmplayer.ui.theme.Tone
@@ -85,6 +86,7 @@ fun HeroPill(
         modifier
             .then(if (stretch) Modifier.widthIn(max = HERO_PILL_MAX).fillMaxWidth() else Modifier.widthIn(min = 160.dp, max = HERO_PILL_MAX))
             .heightIn(min = HERO_PILL_HEIGHT)
+            .pressScale(interactions)
             .then(if (focus != null) Modifier.focusRequester(focus) else Modifier)
             .clip(CircleShape)
             .background(fill)

@@ -304,11 +304,19 @@ private fun BarTab(label: String, icon: ImageVector, selected: Boolean, onClick:
         Motion.standard(Motion.Fast),
         label = "barTabScale",
     )
-    val fill by animateColorAsState(if (focused) Tone.focusFill else Color.Transparent, Motion.standard(Motion.Fast), label = "barTabFill")
+    val fill by animateColorAsState(
+        when {
+            focused -> Tone.focusFill
+            selected -> Tone.accent.copy(alpha = 0.16f)
+            else -> Color.Transparent
+        },
+        Motion.standard(Motion.Fast),
+        label = "barTabFill",
+    )
     val ink by animateColorAsState(
         when {
             focused -> Tone.onFocusFill
-            selected -> Tone.text
+            selected -> Tone.accent
             else -> Tone.muted
         },
         Motion.standard(Motion.Fast),

@@ -141,4 +141,23 @@ Each phase will be verified using:
   - Visual hierarchy: Cards use subtle translucent hairline borders rather than heavy opaque strokes.
   - TV focus indicator: Integrates with `focusRing` and D-pad states.
 
-Next step: Wait for user confirmation to begin Phase 2 (Navigation and Home Screen redesign across Phone, TV, and Desktop).
+### Phase 2 Status: Complete
+- Navigation and Home redesign implemented across form factors:
+  - Desktop persistent sidebar: Added `DesktopSidebar` with Nuvio dark aesthetic, brand lockup, search shortcut (Ctrl+K), primary destinations (Home, Library, Chats, Channels, Continue Watching, History, Downloads, Settings), and profile button with side-placed popover.
+  - Adaptive desktop navigation: `NavFrame` automatically renders persistent `DesktopSidebar` on standard desktop windows (height >= 400dp) and seamlessly falls back to floating `NavBar` for compact heights, preserving full backward compatibility with short test fixtures.
+  - TV top bar and D-pad focus: Modernized `TvTab` on both desktop and Android TV with Nuvio glowing focus states (1.08x scale, high contrast text, accent background glow) while preserving the full D-pad focus graph.
+  - Home hero pills: Enhanced hero action buttons with `pressScale` tactile interaction feedback.
+  - Home empty states: Redesigned `FirstVideoCard`, `FavouritesHintCard`, `HomeOffCard`, and `HomeNoneChosenCard` with `TmSurfaceCard`, subtle borders, and Nuvio dark styling.
+  - Design system navigation component: Added `TmNavItem` supporting both horizontal and compact rail modes with accessibility semantics, focus rings, and selection indicators.
+- Machine Verification:
+  - `:desktop:compileKotlin` compiled cleanly with 0 errors.
+  - `:desktop:test` passed (including `FocusAndSizesShotsTest`, `BigScreenKeysTest`, `SelectedAndEmptyShotsTest`, etc.).
+  - `:ui:jvmTest` passed cleanly.
+  - Em/en dash check: verified 0 instances of unicode dashes in modified files and docs.
+- Manual checklist:
+  - Phone: Adaptive bottom navigation bar and home shelves with real Telegram data.
+  - Desktop: Persistent sidebar on left with Home, Library, Chats, Channels, Continue Watching, History, Downloads, Settings.
+  - TV: Top bar navigation with clear D-pad focus scaling and accent highlight.
+  - Home empty states: Test with empty library / no chosen chats to verify Nuvio dark surface cards.
+
+Next step: Wait for user confirmation to begin Phase 3 (Media browser and cards).
