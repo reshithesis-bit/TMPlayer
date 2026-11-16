@@ -1,5 +1,6 @@
 package com.tmplayer.ui.browse
 
+import androidx.compose.foundation.border
 import com.tmplayer.ui.theme.collectIsFocusVisibleAsState
 import com.tmplayer.ui.components.riseIn
 import androidx.compose.foundation.background
@@ -536,7 +537,8 @@ private fun ProtectedNote(item: MediaItem) {
         color = Tone.muted,
         modifier = Modifier
             .clip(RoundedCornerShape(Corner.Small))
-            .background(Tone.surfaceHigh)
+            .background(Tone.surfaceCard)
+            .border(com.tmplayer.ui.theme.TmTokens.Border.hairline, Tone.borderSubtle, RoundedCornerShape(Corner.Small))
             .padding(horizontal = 12.dp, vertical = 8.dp),
     )
 }
@@ -755,7 +757,7 @@ fun PageDiscButton(
     val fill = when {
         focused -> Tone.focusFill
         active -> Tone.hero
-        else -> Color.Black.copy(alpha = 0.55f)
+        else -> Tone.surfaceCard
     }
     val tint = when {
         focused -> Tone.onFocusFill
@@ -773,6 +775,7 @@ fun PageDiscButton(
                     .size(48.dp)
                     .clip(CircleShape)
                     .background(fill)
+                    .border(com.tmplayer.ui.theme.TmTokens.Border.hairline, if (focused || active) Color.Transparent else Tone.borderSubtle, CircleShape)
                     .clickable(interactionSource = interactions, indication = if (tv) null else androidx.compose.foundation.LocalIndication.current, onClick = onClick)
                     .semantics {
                         contentDescription = label

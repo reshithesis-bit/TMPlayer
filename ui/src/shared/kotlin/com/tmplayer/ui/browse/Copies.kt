@@ -567,8 +567,8 @@ private fun CopySummary(summary: String, count: String, action: String, onClick:
             .clip(shape)
             // Only the outline: a filled block here read as one more card on a page already made
             // of them. On a television the focus fill takes the outline's place.
-            .background(if (focused) Tone.focusFill else Color.Transparent)
-            .then(if (focused) Modifier else Modifier.border(1.dp, Tone.outline, shape))
+            .background(if (focused) Tone.focusFill else Tone.surfaceCard)
+            .then(if (focused) Modifier else Modifier.border(com.tmplayer.ui.theme.TmTokens.Border.hairline, Tone.borderSubtle, shape))
             .focusRing(focused, shape)
             .clickable(interactionSource = interactions, indication = if (tv) null else androidx.compose.foundation.LocalIndication.current, role = Role.Button, onClick = onClick)
             .padding(horizontal = 14.dp, vertical = if (tv) 12.dp else 10.dp),

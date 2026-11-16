@@ -1,5 +1,6 @@
 package com.tmplayer.ui.browse
 
+import androidx.compose.foundation.border
 import com.tmplayer.ui.theme.collectIsFocusVisibleAsState
 import androidx.compose.foundation.background
 import com.tmplayer.ui.theme.trackedFor
@@ -258,7 +259,8 @@ fun MediaDetailPanel(
                 // video's frame down to its middle band, and every other picture of it is 16:9.
                 .aspectRatio(16f / 9f)
                 .clip(RoundedCornerShape(Corner.Medium))
-                .background(Tone.surfaceHigh),
+                .background(Tone.surfaceCard)
+                .border(com.tmplayer.ui.theme.TmTokens.Border.hairline, Tone.borderSubtle, RoundedCornerShape(Corner.Medium)),
         ) {
             if (poster != null) {
                 poster()
@@ -285,7 +287,8 @@ fun MediaDetailPanel(
                         .width(if (compactArt) DETAIL_POSTER_TV else DETAIL_POSTER)
                         .aspectRatio(2f / 3f)
                         .clip(RoundedCornerShape(Corner.Small))
-                        .background(Tone.surfaceHigh),
+                        .background(Tone.surfaceCard)
+                        .border(com.tmplayer.ui.theme.TmTokens.Border.hairline, Tone.borderSubtle, RoundedCornerShape(Corner.Small)),
                 ) {
                     MetaPicture(url, Modifier.fillMaxSize(), maxWidth = 240, contentDescription = s.metadataPoster)
                 }
@@ -343,7 +346,8 @@ fun MediaDetailPanel(
                 color = Tone.muted,
                 modifier = Modifier
                     .clip(RoundedCornerShape(Corner.Small))
-                    .background(Tone.surfaceHigh)
+                    .background(Tone.surfaceCard)
+                    .border(com.tmplayer.ui.theme.TmTokens.Border.hairline, Tone.borderSubtle, RoundedCornerShape(Corner.Small))
                     .padding(horizontal = 12.dp, vertical = 8.dp),
             )
         }
@@ -540,8 +544,8 @@ private fun DetailActionRow(row: DetailRow, modifier: Modifier = Modifier) {
     val background = when {
         focused && row.destructive -> Danger
         focused -> Tone.focusFill
-        touch -> Color.Transparent
-        else -> Tone.surfaceHigh
+        touch -> Tone.surfaceCard
+        else -> Tone.surfaceCard
     }
     val foreground = when {
         focused -> Tone.onFocusFill
@@ -553,6 +557,7 @@ private fun DetailActionRow(row: DetailRow, modifier: Modifier = Modifier) {
             .fillMaxWidth()
             .clip(shape)
             .background(background)
+            .border(com.tmplayer.ui.theme.TmTokens.Border.hairline, if (focused) Color.Transparent else Tone.borderSubtle, shape)
             .focusRing(focused, shape)
             .clickable(interactionSource = interactions, indication = if (touch) androidx.compose.foundation.LocalIndication.current else null, onClick = row.onSelect)
             .padding(horizontal = if (touch) 12.dp else 16.dp, vertical = if (touch) 12.dp else 12.dp),

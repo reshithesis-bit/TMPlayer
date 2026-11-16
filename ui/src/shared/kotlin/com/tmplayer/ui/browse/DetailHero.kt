@@ -104,7 +104,9 @@ internal fun FactLine(facts: List<Fact>, modifier: Modifier = Modifier, style: T
                         color = Tone.text,
                         maxLines = 1,
                         modifier = Modifier
-                            .border(1.dp, Tone.muted.copy(alpha = 0.6f), RoundedCornerShape(Corner.ExtraSmall))
+                            .clip(RoundedCornerShape(Corner.ExtraSmall))
+                            .background(Tone.surfaceCard)
+                            .border(com.tmplayer.ui.theme.TmTokens.Border.hairline, Tone.borderSubtle, RoundedCornerShape(Corner.ExtraSmall))
                             .padding(horizontal = 6.dp, vertical = 1.dp),
                     )
                 } else {
@@ -291,8 +293,13 @@ internal fun RoundAction(
                     when {
                         focused && destructive -> Danger
                         focused -> Tone.focusFill
-                        else -> Tone.surfaceHigh
+                        else -> Tone.surfaceCard
                     },
+                )
+                .border(
+                    com.tmplayer.ui.theme.TmTokens.Border.hairline,
+                    if (focused) Color.Transparent else Tone.borderSubtle,
+                    CircleShape,
                 )
                 .clickable(interactionSource = interactions, indication = null, enabled = !ghost, onClick = press)
                 .then(off)
@@ -334,8 +341,12 @@ internal fun RoundAction(
                 .pressScale(interactions)
                 .downloadRing(progress)
                 .clip(CircleShape)
-                .background(if (focused) Tone.focusFill else Tone.surfaceHigh)
-                .border(1.dp, if (focused) Color.Transparent else Tone.outline, CircleShape),
+                .background(if (focused) Tone.focusFill else Tone.surfaceCard)
+                .border(
+                    com.tmplayer.ui.theme.TmTokens.Border.hairline,
+                    if (focused) Color.Transparent else Tone.borderSubtle,
+                    CircleShape,
+                ),
             contentAlignment = Alignment.Center,
         ) {
             // A switch's icon turns into its other one (the check into the cross, the clock into

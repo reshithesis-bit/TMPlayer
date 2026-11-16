@@ -263,7 +263,8 @@ fun WideDetailPanel(
                     color = Tone.muted,
                     modifier = Modifier
                         .clip(RoundedCornerShape(Corner.Small))
-                        .background(Tone.surfaceHigh)
+                        .background(Tone.surfaceCard)
+                        .border(com.tmplayer.ui.theme.TmTokens.Border.hairline, Tone.borderSubtle, RoundedCornerShape(Corner.Small))
                         .padding(horizontal = 12.dp, vertical = 8.dp),
                 )
             }
@@ -398,7 +399,7 @@ fun WideDetailPanel(
 
                 if (rest.isNotEmpty()) {
                     Column(verticalArrangement = Arrangement.spacedBy(20.dp)) {
-                        HorizontalDivider(color = Tone.outline)
+                        HorizontalDivider(color = Tone.borderSubtle, thickness = com.tmplayer.ui.theme.TmTokens.Border.hairline)
                         FlowRow(horizontalArrangement = Arrangement.spacedBy(10.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
                             rest.forEach { WideTextAction(it.label, it.icon, it.onSelect, destructive = it.destructive) }
                         }
@@ -486,8 +487,8 @@ internal fun WideIconAction(
                     .size(WIDE_ACTION)
                     .downloadRing(progress)
                     .clip(CircleShape)
-                    .background(if (focused) (if (destructive) Danger else Tone.focusFill) else Tone.surfaceHigh)
-                    .border(1.dp, if (focused) Color.Transparent else Tone.outline, CircleShape)
+                    .background(if (focused) (if (destructive) Danger else Tone.focusFill) else Tone.surfaceCard)
+                    .border(com.tmplayer.ui.theme.TmTokens.Border.hairline, if (focused) Color.Transparent else Tone.borderSubtle, CircleShape)
                     .clickable(interactionSource = interactions, indication = if (enabled) LocalIndication.current else null, onClick = if (enabled) onClick else ({}))
                     .semantics {
                         contentDescription = label
@@ -526,8 +527,8 @@ private fun WideTextAction(label: String, icon: ImageVector, onClick: () -> Unit
             .pressScale(interactions, com.tmplayer.ui.components.Micro.PillPressScale)
             .heightIn(min = 40.dp)
             .clip(CircleShape)
-            .background(if (focused) (if (destructive) Danger else Tone.focusFill) else Color.Transparent)
-            .border(1.dp, if (focused) Color.Transparent else Tone.outline, CircleShape)
+            .background(if (focused) (if (destructive) Danger else Tone.focusFill) else Tone.surfaceCard)
+            .border(com.tmplayer.ui.theme.TmTokens.Border.hairline, if (focused) Color.Transparent else Tone.borderSubtle, CircleShape)
             .clickable(interactionSource = interactions, indication = LocalIndication.current, onClick = onClick)
             .padding(start = 14.dp, end = 18.dp),
         verticalAlignment = Alignment.CenterVertically,

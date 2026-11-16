@@ -181,4 +181,23 @@ Each phase will be verified using:
   - Missing thumbnails: Check files with no thumbnail to verify clean Nuvio gradient / play icon fallback.
   - Grid sorting and filters: Verify Sort menu (Newest, Oldest, Name, Longest, Size) and Filter options (All, Unwatched, In Progress, Watched, High Definition) in chat media grid.
 
-Next step: Wait for user confirmation to begin Phase 4 (Video details screen).
+### Phase 4 Status: Complete
+- **Date**: 2026-11-16
+- **What was changed**:
+  - `DetailHero.kt`: Modernized `FactLine` chips (resolution, codecs) with `Tone.surfaceCard` backgrounds, hairline borders (`TmTokens.Border.hairline` with `Tone.borderSubtle`), and `Corner.ExtraSmall` radius. Updated `RoundAction` for both TV pills and touch circular buttons to use `Tone.surfaceCard` and `Tone.borderSubtle` hairline borders with active focus states.
+  - `WideDetail.kt`: Redesigned desktop video detail sheet components with Nuvio aesthetics. Updated `WideIconAction`, `WideTextAction`, protected content note, and horizontal dividers with `Tone.surfaceCard` and `Tone.borderSubtle`.
+  - `MediaDetail.kt`: Updated `MediaDetailPanel` backdrop container, poster container, protected content notice, and `DetailActionRow` (bookmarks and secondary actions) with `Tone.surfaceCard` and hairline borders.
+  - `MediaDetailScreen.kt`: Styled `ProtectedNote` and top back / close disc buttons (`PageDiscButton`) with `Tone.surfaceCard` and hairline subtle borders.
+  - `Copies.kt`: Modernized `CopySummary` with `Tone.surfaceCard` and `Tone.borderSubtle` hairline border.
+- **Verification**:
+  - `:desktop:compileKotlin` passed.
+  - `:desktop:test --tests "com.tmplayer.desktop.ui.DetailSheetRenderTest" :desktop:test --tests "com.tmplayer.desktop.ui.DetailNoShiftTest" :desktop:test --tests "com.tmplayer.desktop.ui.DetailTwoColumnTest"` passed.
+  - `:ui:jvmTest` passed.
+- **Manual Verification Checklist**:
+  - Immersive backdrop: Verify header backdrop fades smoothly into dark background using deep gradient scrim.
+  - Telegram metadata badges: Check video details for accurate resolution chip, file size, duration, and source chat display.
+  - Primary button: Verify Play / Resume button displays high contrast pill with smooth tactile press feedback.
+  - Action buttons: Verify Watch Later, Watched, Download, and Share buttons display refined dark circular cards with hairline borders.
+  - Copies and versions: Verify video versions dropdown / dialog renders with dark surface card styling.
+
+Next step: Wait for user confirmation to begin Phase 5 (Player UI).
