@@ -25,6 +25,15 @@ on:
       - "fastlane/**"
       - "desktop/packaging/aur/**"
   workflow_dispatch:
+    inputs:
+      tg_api_id:
+        description: 'Telegram API ID (optional, overrides secret)'
+        required: false
+        default: ''
+      tg_api_hash:
+        description: 'Telegram API Hash (optional, overrides secret)'
+        required: false
+        default: ''
 
 concurrency:
   group: ci-${{ github.ref }}
@@ -47,7 +56,26 @@ jobs:
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v6
 
-      # No credentials on this path. The app compiles fine without them and says so at runtime,
+      - name: Write Telegram credentials
+        env:
+          INPUT_TG_API_ID: ${{ inputs.tg_api_id }}
+          INPUT_TG_API_HASH: ${{ inputs.tg_api_hash }}
+          SECRET_TG_API_ID: ${{ secrets.TG_API_ID }}
+          SECRET_TG_API_HASH: ${{ secrets.TG_API_HASH }}
+        run: |
+          TG_ID="${INPUT_TG_API_ID:-$SECRET_TG_API_ID}"
+          TG_HASH="${INPUT_TG_API_HASH:-$SECRET_TG_API_HASH}"
+          if [ -n "$TG_ID" ] && [ "$TG_ID" != "0" ]; then
+            cat >> local.properties <<EOF
+          TG_API_ID=$TG_ID
+          TG_API_HASH=$TG_HASH
+          EOF
+            echo "Telegram credentials configured for build"
+          else
+            echo "No Telegram credentials provided"
+          fi
+
+      # No credentials required for tests. The app compiles fine without them and says so at runtime,
       # which is exactly what a fork or a pull request should get.
       # :core is the shared half (TDLib, settings, downloads, the streaming window) and :ui the
       # shared Compose half that the desktop app builds on too. Their tests run on a plain JVM,

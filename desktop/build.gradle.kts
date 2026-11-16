@@ -60,8 +60,14 @@ val localProps = Properties().apply {
 // Credentials and version reach the app as a generated object, the desktop's BuildConfig.
 val generateBuildInfo = tasks.register("generateBuildInfo") {
     val out = layout.buildDirectory.dir("generated/buildinfo")
-    val apiId = localProps.getProperty("TG_API_ID") ?: "0"
-    val apiHash = localProps.getProperty("TG_API_HASH") ?: ""
+    val apiId = localProps.getProperty("TG_API_ID")
+        ?: System.getenv("TG_API_ID")
+        ?: (findProperty("TG_API_ID") as String?)
+        ?: "0"
+    val apiHash = localProps.getProperty("TG_API_HASH")
+        ?: System.getenv("TG_API_HASH")
+        ?: (findProperty("TG_API_HASH") as String?)
+        ?: ""
     // Optional: without it the desktop hides online subtitles, as the Android build does.
     val openSubtitlesKey = localProps.getProperty("OPENSUBTITLES_API_KEY") ?: System.getenv("OPENSUBTITLES_API_KEY") ?: ""
     inputs.property("apiId", apiId)

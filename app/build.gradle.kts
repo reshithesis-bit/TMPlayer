@@ -117,8 +117,16 @@ android {
         versionName = tmVersionName
 
         // Telegram API credentials. Bring your own via local.properties (see README)
-        buildConfigField("int", "TG_API_ID", localProps.getProperty("TG_API_ID") ?: "0")
-        buildConfigField("String", "TG_API_HASH", "\"${localProps.getProperty("TG_API_HASH") ?: ""}\"")
+        val apiId = localProps.getProperty("TG_API_ID")
+            ?: System.getenv("TG_API_ID")
+            ?: (findProperty("TG_API_ID") as String?)
+            ?: "0"
+        val apiHash = localProps.getProperty("TG_API_HASH")
+            ?: System.getenv("TG_API_HASH")
+            ?: (findProperty("TG_API_HASH") as String?)
+            ?: ""
+        buildConfigField("int", "TG_API_ID", apiId)
+        buildConfigField("String", "TG_API_HASH", "\"$apiHash\"")
 
         // Where an opted-in crash report goes. Empty is the normal case and the honest default:
         // with no DSN the reporting code never initialises, the Settings switch is not offered,
